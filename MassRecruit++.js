@@ -66,7 +66,7 @@ function findVillageAmount() {
 function findVillages() {
 	var village = createArrays();
 	for (i = 0; i < villageAmount; i++) {
-		village[i][0] = $('#mass_train_table').find(".row_marker tr td a:eq(i)").text();
+		village[i][0] = $('#mass_train_table').attr("href").exec(/village=([0-9]{1,}+)/)[1]; //.find(".row_marker:eq(i)").text();
 		log("Village " + i + " = " + village[i][0]);
 	};
 };
@@ -84,3 +84,4 @@ function createArrays() {
 
 //Need-to-remember stuff:
 //var test = $('table.mass_train_table').find(".contexted:eq(0)").text();
+//http://stackoverflow.com/questions/872217/jquery-how-to-extract-value-from-href-tag
