@@ -31,9 +31,56 @@
  */
 
 //Variable stuff:
-
+var villageAmount;
 var village = [];
 
-if (location.href.match(/^https:\/\/((nl|zz|en).*\.tribalwars\.(nl|net)\/(game.php).*)/)) {
-	
+var config = {
+	debug: true
 };
+
+
+//Code stuff:
+function log(logmsg) {
+	if (config.debug) {
+		console.log(logmsg);
+	}
+};
+
+if (location.href.match(/^https:\/\/((nl|zz|en).*\.tribalwars\.(nl|net)\/(game.php).*)/)) {
+	$(function() {
+		$(".btn[value='Verschil invoeren']").click( function() {
+			log("Button clicked");
+			findVillageAmount();
+			findVillages();
+		});
+	});
+};
+
+function findVillageAmount() {
+	//Gets the amount of villages in this list from the table header.
+	var villageAmountStr = $('#mass_train_table').find("th:eq(0)").text();
+	villageAmount = /[0-9]{1,}/.exec(villageAmountStr);
+	log("Amount of villages: " + villageAmount);
+};
+
+function findVillages() {
+	var village = createArrays();
+	for (i = 0; i < villageAmount; i++) {
+		village[i][0] = $('#mass_train_table').find(".row_marker tr td a:eq(i)").text();
+		log("Village " + i + " = " + village[i][0]);
+	};
+};
+
+function createArrays() {
+	//Creating the arrays needed
+	var village = new Array(villageAmount);
+	for (var i = 0; i < villageAmount; i++) {
+		village[i] = new Array();
+	}
+	log("Created arrays");
+	//log(village);
+	return village;
+};
+
+//Need-to-remember stuff:
+//var test = $('table.mass_train_table').find(".contexted:eq(0)").text();
