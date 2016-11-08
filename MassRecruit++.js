@@ -65,9 +65,27 @@ function findVillageAmount() {
 
 function findVillages() {
 	var village = createArrays();
-	for (i = 0; i < villageAmount; i++) {
-		village[i][0] = $('#mass_train_table').attr("href").exec(/village=([0-9]{1,}+)/)[1]; //.find(".row_marker:eq(i)").text();
+	var villageCount = 0;
+	var tempVillageAmount = villageAmount;
+	for (i = 0; i < tempVillageAmount; i++) {
+		var villagelink = $("#mass_train_table .row_marker a:eq(" + i + ")").attr("href");
+		log(villagelink);
+		
+		if (villageCount < villageAmount) {
+			log("villageCount < villageAmount");
+			log(villageCount + " < " + villageAmount);
+		}
+		
+		if (villagelink.indexOf("screen=overview")/*[0]*/ && villageCount < villageAmount) {
+		village[i][0] = villagelink.match(/village=([0-9]+)/)[0]; ///village=([0-9]{1,}+)/.exec('#mass_train_table'); //.find(".row_marker:eq(i)").text(); .attr("href")
 		log("Village " + i + " = " + village[i][0]);
+		villageCount++;
+		log("Currently " + villageCount + " villages found!");
+		} else {
+			log("No match: " + villagelink);
+			tempVillageAmount++;
+			log("Changed tempVillageAmount to: " + tempVillageAmount);
+		}
 	};
 };
 
@@ -84,4 +102,7 @@ function createArrays() {
 
 //Need-to-remember stuff:
 //var test = $('table.mass_train_table').find(".contexted:eq(0)").text();
-//http://stackoverflow.com/questions/872217/jquery-how-to-extract-value-from-href-tag
+// http://stackoverflow.com/questions/872217/jquery-how-to-extract-value-from-href-tag
+// http://stackoverflow.com/questions/28192958/cannot-read-property-match-of-undefined
+// http://www.w3schools.com/jsref/jsref_match.asp
+// http://api.jquery.com/attr/
