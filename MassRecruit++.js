@@ -35,21 +35,29 @@ var villageAmount;
 var village = [];
 
 var config = {
-	debug: true
+	debug: true,
+	level: 1 // 1: everything, 2: most things, 3: really limited things
 };
 
 
 //Code stuff:
-function log(logmsg) {
+function log(lvl, logmsg) {
+	if (config.debug) {
+		if (config.level >= lvl) {
+			console.log(logmsg);
+		}
+	}
+	
+	/*
 	if (config.debug) {
 		console.log(logmsg);
-	}
+	}*/
 };
 
 if (location.href.match(/^https:\/\/((nl|zz|en).*\.tribalwars\.(nl|net)\/(game.php).*)/)) {
 	$(function() {
 		$(".btn[value='Verschil invoeren']").click( function() {
-			log("Button clicked");
+			log(3, "Button clicked");
 			findVillageAmount();
 			findVillages();
 		});
@@ -60,7 +68,7 @@ function findVillageAmount() {
 	//Gets the amount of villages in this list from the table header.
 	var villageAmountStr = $('#mass_train_table').find("th:eq(0)").text();
 	villageAmount = /[0-9]{1,}/.exec(villageAmountStr);
-	log("Amount of villages: " + villageAmount);
+	log(3, "Amount of villages: " + villageAmount);
 };
 
 function findVillages() {
@@ -69,23 +77,27 @@ function findVillages() {
 	var tempVillageAmount = villageAmount;
 	for (i = 0; i < tempVillageAmount; i++) {
 		var villagelink = $("#mass_train_table .row_marker a:eq(" + i + ")").attr("href");
-		log(villagelink);
+		log(3, villagelink);
 		
 		if (villageCount < villageAmount) {
-			log("villageCount < villageAmount");
-			log(villageCount + " < " + villageAmount);
+			log(2, "villageCount < villageAmount");
+			log(2, villageCount + " < " + villageAmount);
 		}
 		
-		if (villagelink.indexOf("screen=overview")/*[0]*/ && villageCount < villageAmount) {
-		village[i][0] = villagelink.match(/village=([0-9]+)/)[0]; ///village=([0-9]{1,}+)/.exec('#mass_train_table'); //.find(".row_marker:eq(i)").text(); .attr("href")
-		log("Village " + i + " = " + village[i][0]);
-		villageCount++;
-		log("Currently " + villageCount + " villages found!");
+		log(2, "villagelink.indexOf('screen=overview') = " + villagelink.indexOf("screen=overview"));
+		
+		if (villagelink.indexOf("screen=overview")/*[0]*/ != -1 && villageCount < villageAmount) {
+			village[villageCount][0] = villagelink.match(/village=([0-9]+)/)/*[0]*/; ///village=([0-9]{1,}+)/.exec('#mass_train_table'); //.find(".row_marker:eq(i)").text(); .attr("href")
+			log(2, "Village " + villageCount + " = " + village[villageCount][0]);
+			villageCount++;
+			log(1, "Currently " + villageCount + " villages found!");
+			log(1, "Most recent village: " + village[villageCount - 1][0]);
 		} else {
-			log("No match: " + villagelink);
+			log(2, "No match: " + villagelink);
 			tempVillageAmount++;
-			log("Changed tempVillageAmount to: " + tempVillageAmount);
+			log(3, "Changed tempVillageAmount to: " + tempVillageAmount);
 		}
+		log(2, "-----------------------------------");
 	};
 };
 
@@ -95,7 +107,7 @@ function createArrays() {
 	for (var i = 0; i < villageAmount; i++) {
 		village[i] = new Array();
 	}
-	log("Created arrays");
+	log(1, "Created arrays");
 	//log(village);
 	return village;
 };
