@@ -47,20 +47,25 @@ function log(lvl, logmsg) {
 			console.log(logmsg);
 		}
 	}
-	
-	/*
-	if (config.debug) {
-		console.log(logmsg);
-	}*/
 };
 
-if (location.href.match(/^https:\/\/((nl|zz|en).*\.tribalwars\.(nl|net)\/(game.php).*)/)) {
+if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=mass/)) {
+	log(1, "Href match > mode=mass");
+
 	$(function() {
 		$(".btn[value='Verschil invoeren']").click( function() {
-			log(3, "Button clicked");
+			log(3, "Difference button clicked");
 			findVillageAmount();
 			findVillages();
 		});
+	});
+};
+
+if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=train/)) {
+	log(1, "Href match > mode=train");
+	
+	$(function() {
+		log(1, "Screen = train");
 	});
 };
 
@@ -111,6 +116,41 @@ function createArrays() {
 	//log(village);
 	return village;
 };
+
+//Usefull function to decode an URL. More info here: http://stackoverflow.com/questions/40740474/javascript-find-out-if-url-tag-matches/40740931
+
+window.decodeUrl = function decodeUrl(url) {  
+	var a = document.createElement('A');
+	function inner(url) {  
+		a.href = url;
+		return {
+			protocol: a.protocol,
+			hostname: a.hostname,
+			pathname: a.pathname,
+			search: a.search,
+			params: a.search.replace(/(^\?)/,'').split("&").
+				map(function(n){return n = n.split("="),
+				this[n[0]] = n[1],this}.bind({}))[0]
+		};
+	};
+	window.decodeUrl = inner;
+	return inner(url);
+};
+
+/*
+USAGE:
+
+var url = 'https://nlp2.tribalwars.nl/game.php?village=171817&screen=train';
+
+var durl = decodeUrl(url);
+
+console.log(durl);
+
+console.log(
+	'Are we game & train : ' + 
+	((durl.pathname === '/game.php') &&
+	(durl.params.screen === 'train'))
+);*/
 
 //Need-to-remember stuff:
 //var test = $('table.mass_train_table').find(".contexted:eq(0)").text();
