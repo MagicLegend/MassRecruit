@@ -28,6 +28,10 @@
  *	* village[i, 3] = calculated amount of troops
  *
  * Round off the numbers when they don't make an even number unless the entered amount is less than 500
+ *
+ ** STUFF TO DO:
+ * 
+ * - Add message if the URL is wrong (no "&mode=train&" on the URL)
  */
 
 //Variable stuff:
@@ -66,6 +70,9 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
 	
 	$(function() {
 		log(1, "Screen = train");
+		$("#train_form > .vis > tbody > tr:not(.row_a, .row_b)").first().append("<th style='width: 80px'>To Do:</th>");
+		log(1, "Added heading");
+		//$("#train_form, .vis").size();
 	});
 };
 
@@ -117,7 +124,7 @@ function createArrays() {
 	return village;
 };
 
-//Usefull function to decode an URL. More info here: http://stackoverflow.com/questions/40740474/javascript-find-out-if-url-tag-matches/40740931
+//Useful function to decode an URL. More info here: http://stackoverflow.com/questions/40740474/javascript-find-out-if-url-tag-matches/40740931
 
 window.decodeUrl = function decodeUrl(url) {  
 	var a = document.createElement('A');
