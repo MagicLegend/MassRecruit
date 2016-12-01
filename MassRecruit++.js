@@ -32,11 +32,19 @@
  ** STUFF TO DO:
  * 
  * - Add message if the URL is wrong (no "&mode=train&" on the URL)
+ * - Add option to add new groupnames that will recognize patterns
+ * - Add button to add new patterns
+ * - Save patterns to a cookie?
  */
 
 //Variable stuff:
 var villageAmount;
 var village = [];
+var offence = [0,0,8500,0,500,2500,0,0,150,0];
+var defence = [7500,8500,0,1000,0,0,0,0,5,0];
+
+//Setup:
+//var offence = [spear, sword, axe, archer, spy, light, marcher, heavy, ram, cata]
 
 var config = {
 	debug: true,
@@ -72,7 +80,12 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
 		log(1, "Screen = train");
 		$("#train_form > .vis > tbody > tr:not(.row_a, .row_b)").first().append("<th style='width: 80px'>To Do:</th>");
 		log(1, "Added heading");
-		//$("#train_form, .vis").size();
+		var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+		log(1, "Amount of entries: " + tableLength);
+		for (i = 1; i < tableLength + 1; i++) {
+			$("#train_form > .vis > tbody > tr").eq(i).append("<td>Test</td>");
+			var temp = $()
+		}
 	});
 };
 
