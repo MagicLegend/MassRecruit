@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name			MassRecruit++
 // @namespace		http://tampermonkey.net/
-// @version			0.1
+// @version			0.2
 // @description		Improves the TW messagenames.
 // @author			MagicLegend
 // @grant			none
@@ -9,14 +9,13 @@
 // ==/UserScript==
 
 /** LICENCE:
- * MassRecruit++ v0.1 © 2016 MagicLegend
+ * MassRecruit++ v0.2 © 2016 MagicLegend
  * This work is under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) Licence.
  * More info can be found here: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en (Human readable, not the actual licence) & https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode (Actual licence)
  *
  * v0.1		Initial work, trying some stuff
+ * v0.2		Now works for the offence category
  */
-
-//var test = $('#axe_167672').val();
 
 /** IDEA:
  * Fetch the amount of villages from the thead
@@ -35,6 +34,7 @@
  * - Add option to add new groupnames that will recognize patterns
  * - Add button to add new patterns
  * - Save patterns to a cookie?
+ * - Read which units are in recruitment, and subtract them from the To Do
  */
 
 //Variable stuff:
@@ -83,8 +83,13 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
 		var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
 		log(1, "Amount of entries: " + tableLength);
 		for (i = 1; i < tableLength + 1; i++) {
-			$("#train_form > .vis > tbody > tr").eq(i).append("<td>Test</td>");
-			var temp = $()
+			var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(i-1).text();
+			//log(1, temp);
+			var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+			log(1, textAfterHash);
+			var displayText = offence[i-1] - textAfterHash;
+			
+			$("#train_form > .vis > tbody > tr").eq(i).append("<td>"+displayText+"</td>");
 		}
 	});
 };
