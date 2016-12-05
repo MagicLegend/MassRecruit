@@ -35,6 +35,10 @@
  * - Add button to add new patterns
  * - Save patterns to a cookie?
  * - Read which units are in recruitment, and subtract them from the To Do
+ * - Add a little bit of documentation on the github page
+ *
+ ** KNOWN BUGS:
+ * - When an unit is finished the added column is removed
  */
 
 //Variable stuff:
