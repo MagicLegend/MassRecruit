@@ -44,6 +44,9 @@
 //Variable stuff:
 var villageAmount;
 var village = [];
+var barrackUnits = ["spear", "sword", "axe", "archer"];
+var stableUnits = ["spy", "light", "marcher", "heavy"];
+var garageUnits = ["ram", "cata"];
 var offence = [0,0,8500,0,500,2500,0,0,150,0];
 var defence = [7500,8500,0,1000,0,0,0,0,5,0];
 
@@ -102,13 +105,41 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
 function getBarrackRecruiting() {
 	log(1, "Entered barrack");
 	try {
-		var tempLit = $("#replace_barracks > .trainqueue_wrap > .vis > .lit > .lit-item").first().text();
-		var hasClass = $("#replace_barracks > .trainqueue_wrap > .vis > .lit > .lit-item > .unit_sprite").attr("axe");
+		//tempLit = amount of troops in the lit place
+		var tempLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
+		
+		for (int i = 0; i < barrackUnits.Length; i++) {
+			var hasClassLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(barrackUnits[i]);
+			var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass(barrackUnits[i]);
+			if (hasClassRest) {
+				log(1, "Found type: " + barrackUnits[i]);
+			}
+		}
+		
+		
+		
+		
+		var temp = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass("axe");
+		var hasClass = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass("axe");
 		log(1, "hasAxe: " + hasClass);
 		log(1, "tempLit: " + tempLit);
+		log(1, "temp: " + temp);
 	} catch (ex) {
 		log(1, "thrown error " + ex.message);
 	}
+}
+
+function getStableRecruiting() {
+	log(1, "Entered stable");
+	try {
+		
+	} catch {
+		
+	}
+}
+
+function getGarageRecruiting() {
+	log(1, "Entered garage");
 }
 
 function findVillageAmount() {
