@@ -84,19 +84,32 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
 		log(1, "Screen = train");
 		$("#train_form > .vis > tbody > tr:not(.row_a, .row_b)").first().append("<th style='width: 80px'>To Do:</th>");
 		log(1, "Added heading");
+		getBarrackRecruiting();
 		var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
 		log(1, "Amount of entries: " + tableLength);
 		for (i = 1; i < tableLength + 1; i++) {
 			var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(i-1).text();
 			//log(1, temp);
 			var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-			log(1, textAfterHash);
+			//log(1, textAfterHash);
 			var displayText = offence[i-1] - textAfterHash;
 			
 			$("#train_form > .vis > tbody > tr").eq(i).append("<td>"+displayText+"</td>");
 		}
 	});
 };
+
+function getBarrackRecruiting() {
+	log(1, "Entered barrack");
+	try {
+		var tempLit = $("#replace_barracks > .trainqueue_wrap > .vis > .lit > .lit-item").first().text();
+		var hasClass = $("#replace_barracks > .trainqueue_wrap > .vis > .lit > .lit-item > .unit_sprite").attr("axe");
+		log(1, "hasAxe: " + hasClass);
+		log(1, "tempLit: " + tempLit);
+	} catch (ex) {
+		log(1, "thrown error " + ex.message);
+	}
+}
 
 function findVillageAmount() {
 	//Gets the amount of villages in this list from the table header.
