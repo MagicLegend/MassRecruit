@@ -114,18 +114,19 @@ function getBarrackRecruiting() {
 			var hasClassLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(barrackUnits[i]);
 			var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass(barrackUnits[i]);
 			if (hasClassRest) {
-				log(1, "Found type: " + barrackUnits[i]);
+                log(1, "Found type: " + barrackUnits[i]);
+                break;
             } else {
                 log(1, "Nope. Found type: " + barrackUnits[i]);
             }
 		}
 		
-		
+		/*
 		var temp = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass("axe");
 		var hasClass = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass("axe");
 		log(1, "hasAxe: " + hasClass);
 		log(1, "tempLit: " + tempLit);
-		log(1, "temp: " + temp);
+		log(1, "temp: " + temp);*/
 	} catch (ex) {
 		log(1, "thrown error " + ex.message);
 	}
