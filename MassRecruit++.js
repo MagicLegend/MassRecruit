@@ -106,17 +106,19 @@ function getBarrackRecruiting() {
 	log(1, "Entered barrack");
 	try {
 		//tempLit = amount of troops in the lit place
-		var tempLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
-		
-		for (int i = 0; i < barrackUnits.Length; i++) {
+        var tempLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
+        log(1, "barrackunits.length: " + barrackUnits.length);
+
+        for (var i = 0; i < barrackUnits.length; i++) {
+            log(1, "Entered for loop");
 			var hasClassLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(barrackUnits[i]);
 			var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass(barrackUnits[i]);
 			if (hasClassRest) {
 				log(1, "Found type: " + barrackUnits[i]);
-			}
+            } else {
+                log(1, "Nope. Found type: " + barrackUnits[i]);
+            }
 		}
-		
-		
 		
 		
 		var temp = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass("axe");
@@ -133,8 +135,8 @@ function getStableRecruiting() {
 	log(1, "Entered stable");
 	try {
 		
-	} catch {
-		
+	} catch (ex) {
+        log(1, ex);
 	}
 }
 
