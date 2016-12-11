@@ -36,6 +36,9 @@
  * - Save patterns to a cookie?
  * - Read which units are in recruitment, and subtract them from the To Do
  * - Add a little bit of documentation on the github page
+ * - Add function calls for the non-premium buildings
+ * - Write the fetching of the current units in a variable function
+ * - Write the current units with their name in a 2D array
  *
  ** KNOWN BUGS:
  * - When an unit is finished the added column is removed
@@ -44,173 +47,332 @@
 //Variable stuff:
 var villageAmount;
 var village = [];
+var trainingBarrack = [];
+var trainingStable = [];
+var trainingGarage = [];
+var currentUnits = [];
+
 var barrackUnits = ["spear", "sword", "axe", "archer"];
 var stableUnits = ["spy", "light", "marcher", "heavy"];
 var garageUnits = ["ram", "cata"];
-var offence = [0,0,8500,0,500,2500,0,0,150,0];
-var defence = [7500,8500,0,1000,0,0,0,0,5,0];
+var offence = [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0];
+var defence = [7500, 8500, 0, 1000, 0, 0, 0, 0, 5, 0];
 
 //Setup:
 //var offence = [spear, sword, axe, archer, spy, light, marcher, heavy, ram, cata]
 
 var config = {
-	debug: true,
-	level: 1 // 1: everything, 2: most things, 3: really limited things
+    debug: true,
+    level: 1 // 1: everything, 2: most things, 3: really limited things
 };
 
 
 //Code stuff:
+
 function log(lvl, logmsg) {
-	if (config.debug) {
-		if (config.level >= lvl) {
-			console.log(logmsg);
-		}
-	}
+    if (config.debug) {
+        if (config.level >= lvl) {
+            console.log("Ge: " + logmsg);
+        }
+    }
+};
+
+function logBarrack(lvl, logmsg) {
+    if (config.debug) {
+        if (config.level >= lvl) {
+            console.log("B: " + logmsg);
+        }
+    }
+};
+
+function logStable(lvl, logmsg) {
+    if (config.debug) {
+        if (config.level >= lvl) {
+            console.log("S: " + logmsg);
+        }
+    }
+};
+
+function logGarage(lvl, logmsg) {
+    if (config.debug) {
+        if (config.level >= lvl) {
+            console.log("G: " + logmsg);
+        }
+    }
 };
 
 if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=mass/)) {
-	log(1, "Href match > mode=mass");
+    log(1, "Href match > mode=mass");
 
-	$(function() {
-		$(".btn[value='Verschil invoeren']").click( function() {
-			log(3, "Difference button clicked");
-			findVillageAmount();
-			findVillages();
-		});
-	});
+    $(function () {
+        $(".btn[value='Verschil invoeren']").click(function () {
+            log(3, "Difference button clicked");
+            findVillageAmount();
+            findVillages();
+        });
+    });
 };
 
 if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=train/)) {
-	log(1, "Href match > mode=train");
-	
-	$(function() {
-		log(1, "Screen = train");
-		$("#train_form > .vis > tbody > tr:not(.row_a, .row_b)").first().append("<th style='width: 80px'>To Do:</th>");
-		log(1, "Added heading");
-		getBarrackRecruiting();
-		var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
-		log(1, "Amount of entries: " + tableLength);
-		for (i = 1; i < tableLength + 1; i++) {
-			var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(i-1).text();
-			//log(1, temp);
-			var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-			//log(1, textAfterHash);
-			var displayText = offence[i-1] - textAfterHash;
-			
-			$("#train_form > .vis > tbody > tr").eq(i).append("<td>"+displayText+"</td>");
-		}
-	});
+    log(1, "Href match > mode=train");
+
+    $(function () {
+        log(1, "Screen = train");
+        $("#train_form > .vis > tbody > tr:not(.row_a, .row_b)").first().append("<th style='width: 80px'>To Do:</th>");
+        log(1, "Added heading");
+        createRecruitArrays();
+        getBarrackRecruiting();
+        getStableRecruiting();
+        getGarageRecruiting();
+
+        var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+        log(1, "Amount of entries: " + tableLength);
+
+        for (i = 1; i < tableLength + 1; i++) {
+            var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(i - 1).text();
+            var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+            var unit = $("#train_form > .vis > tbody > tr > td > a").hasClass()
+            currentUnits[i, ];
+            log(1, "Current units: " + currentUnits[i, textAfterHash]);
+
+            var displayText = offence[i - 1] - textAfterHash;
+            $("#train_form > .vis > tbody > tr").eq(i).append("<td>" + displayText + "</td>");
+        }
+    });
 };
 
 function getBarrackRecruiting() {
-	log(1, "Entered barrack");
-	try {
-		//tempLit = amount of troops in the lit place
-        var tempLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
-        log(1, "barrackunits.length: " + barrackUnits.length);
+    logBarrack(1, "Entered barrack");
+    try {
+        var trainingLength = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr").length; //-1 to account for the cancel everything button at the bottom.
+        //logBarrack(1, "barrackunits.length: " + barrackUnits.length);
+        logBarrack(1, "trainingLength: " + trainingLength);
 
+
+        //--[[Code for finding the current recruiting lit unit]]--
         for (var i = 0; i < barrackUnits.length; i++) {
-            log(1, "Entered for loop");
-			var hasClassLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(barrackUnits[i]);
-			var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass(barrackUnits[i]);
-			if (hasClassRest) {
-                log(1, "Found type: " + barrackUnits[i]);
-                break;
-            } else {
-                log(1, "Nope. Found type: " + barrackUnits[i]);
+            var hasClassLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(barrackUnits[i]);
+            if (hasClassLit) {
+                var amountTroopsLeftLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
+                trainingBarrack[0, 0] = barrackUnits[i];
+                trainingBarrack[0, 1] = amountTroopsLeftLit;
+                logBarrack(1, "Lit unit: " + trainingBarrack[0, 0]);
+                logBarrack(1, "And has " + trainingBarrack[0, 1] + " left");
+                logBarrack(1, "----------");
+                //break;
             }
-		}
-		
-		/*
-		var temp = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr > td > .unit_sprite").hasClass("axe");
-		var hasClass = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass("axe");
-		log(1, "hasAxe: " + hasClass);
-		log(1, "tempLit: " + tempLit);
-		log(1, "temp: " + temp);*/
-	} catch (ex) {
-		log(1, "thrown error " + ex.message);
-	}
+        }
+
+
+        //--[[Code for finding the list of recruiting units]]--
+        for (var j = 1; j < trainingLength + 1; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
+            //log(1, "First for loop " + j);
+            for (var i = 0; i < barrackUnits.length; i++) {
+                //log(1, "Entered for loop " + i);
+                var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > #trainorder_" + j + " > td > .unit_sprite").hasClass(barrackUnits[i]);
+                if (hasClassRest) {
+                    var amountTroopsLeft = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > #trainorder_" + j + " > td").text().match(/\d+/);
+                    trainingBarrack[j, 0] = barrackUnits[i];
+                    trainingBarrack[j, 1] = amountTroopsLeft;
+                    logBarrack(1, "Unit " + j + " has type: " + trainingBarrack[j, 0]);
+                    logBarrack(1, "And has " + trainingBarrack[j, 1] + " units to do");
+                    logBarrack(1, "----------");
+                } else {
+                    //log(1, "Nope. Found type: " + barrackUnits[i]);
+                }
+            }
+        }
+    } catch (ex) {
+        logBarrack(1, "thrown error " + ex.message);
+    }
 }
 
 function getStableRecruiting() {
-	log(1, "Entered stable");
-	try {
-		
-	} catch (ex) {
-        log(1, ex);
-	}
+    logStable(1, "Entered stable");
+    try {
+        var trainingLength = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > tr").length; //-1 to account for the cancel everything button at the bottom.
+        logStable(1, "trainingLength: " + trainingLength);
+
+        //--[[Code for finding the current recruiting lit unit]]--
+        for (var i = 0; i < stableUnits.length; i++) {
+            var hasClassLit = $("#replace_stable > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(stableUnits[i]);
+            if (hasClassLit) {
+                var amountTroopsLeftLit = $("#replace_stable > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
+                logStable(1, "Lit unit: " + stableUnits[i]);
+                logStable(1, "And has " + amountTroopsLeftLit + " left");
+                trainingStable[0, 0] = stableUnits[i];
+                trainingStable[0, 1] = amountTroopsLeftLit;
+                logStable(1, "----------");
+                //break;
+            }
+        }
+
+
+        //--[[Code for finding the list of recruiting units]]--
+        for (var j = 1; j < trainingLength + 1; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
+            //log(1, "First for loop " + j);
+            for (var i = 0; i < barrackUnits.length; i++) {
+                //log(1, "Entered for loop " + i);
+                var hasClassRest = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td > .unit_sprite").hasClass(stableUnits[i]);
+                if (hasClassRest) {
+                    var amountTroopsLeft = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td").text().match(/\d+/);
+                    trainingStable[j, 0] = stableUnits[i];
+                    trainingStable[j, 1] = amountTroopsLeft;
+                    logStable(1, "Unit " + j + " has type: " + trainingStable[j, 0]);
+                    logStable(1, "And has " + trainingStable[j, 1] + " units to do");
+                    logStable(1, "----------");
+                } else {
+                    //logStable(1, "Nope. Found type: " + stableUnits[i]);
+                }
+            }
+        }
+    } catch (ex) {
+        logStable(1, ex);
+    }
 }
 
 function getGarageRecruiting() {
-	log(1, "Entered garage");
+    log(1, "Entered garage");
+    try {
+        var trainingLength = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > tr").length; //-1 to account for the cancel everything button at the bottom.
+        logGarage(1, "trainingLength: " + trainingLength);
+
+
+        //--[[Code for finding the current recruiting lit unit]]--
+        for (var i = 0; i < garageUnits.length; i++) {
+            var hasClassLit = $("#replace_garage > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(garageUnits[i]);
+            if (hasClassLit) {
+                var amountTroopsLeftLit = $("#replace_garage > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
+                logGarage(1, "Lit unit: " + garageUnits[i]);
+                logGarage(1, "And has " + amountTroopsLeftLit + " left");
+                trainingGarage[0, 0] = garageUnits[i];
+                trainingGarage[0, 1] = amountTroopsLeftLit;
+                logGarage(1, "----------");
+                //break;
+            }
+        }
+
+
+        //--[[Code for finding the list of recruiting units]]--
+        for (var j = 1; j < trainingLength + 1; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
+            //log(1, "First for loop " + j);
+            for (var i = 0; i < garageUnits.length; i++) {
+                //log(1, "Entered for loop " + i);
+                var hasClassRest = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > #trainorder_" + j + " > td > .unit_sprite").hasClass(garageUnits[i]);
+                if (hasClassRest) {
+                    var amountTroopsLeft = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > #trainorder_" + j + " > td").text().match(/\d+/);
+                    trainingGarage[j, 0] = garageUnits[i];
+                    trainingGarage[j, 1] = amountTroopsLeft;
+                    logGarage(1, "Unit " + j + " has type: " + trainingGarage[j, 0]);
+                    logGarage(1, "And has " + trainingGarage[j, 1] + " units to do");
+                    logGarage(1, "----------");
+                } else {
+                    //logGarage(1, "Nope. Found type: " + GarageUnits[i]);
+                }
+            }
+        }
+    } catch (ex) {
+        logGarage(1, ex);
+    }
 }
 
+function createRecruitArrays() {
+    var trainingLengthBarrack = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr").length; //-1 to account for the cancel everything button at the bottom.
+    trainingBarrack = new Array(trainingLengthBarrack);
+    for (var i = 0; i < 2; i++) {
+        trainingBarrack[i] = new Array(); //Add the 2nd array list
+    }
+
+    var trainingLengthStable = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > tr").length; //-1 to account for the cancel everything button at the bottom.
+    trainingStable = new Array(trainingLengthStable);
+    for (var j = 0; j < 2; j++) {
+        trainingStable[j] = new Array(); //Add the 2nd array list
+    }
+
+    var trainingLengthGarage = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > tr").length; //-1 to account for the cancel everything button at the bottom.
+    trainingGarage = new Array(trainingLengthStable);
+    for (var k = 0; k < 2; k++) {
+        trainingGarage[k] = new Array(); //Add the 2nd array list
+    }
+
+    var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+    currentUnits - new Array(tableLength);
+    for (var l = 0; l < 2; l++) {
+        currentUnits[l] = new Array(); //Add the 2nd array list
+    }
+}
+
+
+//--[[Functions for the mass-recruit function]]--
+
 function findVillageAmount() {
-	//Gets the amount of villages in this list from the table header.
-	var villageAmountStr = $('#mass_train_table').find("th:eq(0)").text();
-	villageAmount = /[0-9]{1,}/.exec(villageAmountStr);
-	log(3, "Amount of villages: " + villageAmount);
+    //Gets the amount of villages in this list from the table header.
+    var villageAmountStr = $('#mass_train_table').find("th:eq(0)").text();
+    villageAmount = /[0-9]{1,}/.exec(villageAmountStr);
+    log(3, "Amount of villages: " + villageAmount);
 };
 
 function findVillages() {
-	var village = createArrays();
-	var villageCount = 0;
-	var tempVillageAmount = villageAmount;
-	for (i = 0; i < tempVillageAmount; i++) {
-		var villagelink = $("#mass_train_table .row_marker a:eq(" + i + ")").attr("href");
-		log(3, villagelink);
-		
-		if (villageCount < villageAmount) {
-			log(2, "villageCount < villageAmount");
-			log(2, villageCount + " < " + villageAmount);
-		}
-		
-		log(2, "villagelink.indexOf('screen=overview') = " + villagelink.indexOf("screen=overview"));
-		
-		if (villagelink.indexOf("screen=overview")/*[0]*/ != -1 && villageCount < villageAmount) {
-			village[villageCount][0] = villagelink.match(/village=([0-9]+)/)/*[0]*/; ///village=([0-9]{1,}+)/.exec('#mass_train_table'); //.find(".row_marker:eq(i)").text(); .attr("href")
-			log(2, "Village " + villageCount + " = " + village[villageCount][0]);
-			villageCount++;
-			log(1, "Currently " + villageCount + " villages found!");
-			log(1, "Most recent village: " + village[villageCount - 1][0]);
-		} else {
-			log(2, "No match: " + villagelink);
-			tempVillageAmount++;
-			log(3, "Changed tempVillageAmount to: " + tempVillageAmount);
-		}
-		log(2, "-----------------------------------");
-	};
+    var village = createArrays();
+    var villageCount = 0;
+    var tempVillageAmount = villageAmount;
+    for (i = 0; i < tempVillageAmount; i++) {
+        var villagelink = $("#mass_train_table .row_marker a:eq(" + i + ")").attr("href");
+        log(3, villagelink);
+
+        if (villageCount < villageAmount) {
+            log(2, "villageCount < villageAmount");
+            log(2, villageCount + " < " + villageAmount);
+        }
+
+        log(2, "villagelink.indexOf('screen=overview') = " + villagelink.indexOf("screen=overview"));
+
+        if (villagelink.indexOf("screen=overview")/*[0]*/ != -1 && villageCount < villageAmount) {
+            village[villageCount][0] = villagelink.match(/village=([0-9]+)/)/*[0]*/; ///village=([0-9]{1,}+)/.exec('#mass_train_table'); //.find(".row_marker:eq(i)").text(); .attr("href")
+            log(2, "Village " + villageCount + " = " + village[villageCount][0]);
+            villageCount++;
+            log(1, "Currently " + villageCount + " villages found!");
+            log(1, "Most recent village: " + village[villageCount - 1][0]);
+        } else {
+            log(2, "No match: " + villagelink);
+            tempVillageAmount++;
+            log(3, "Changed tempVillageAmount to: " + tempVillageAmount);
+        }
+        log(2, "-----------------------------------");
+    };
 };
 
 function createArrays() {
-	//Creating the arrays needed
-	var village = new Array(villageAmount);
-	for (var i = 0; i < villageAmount; i++) {
-		village[i] = new Array();
-	}
-	log(1, "Created arrays");
-	//log(village);
-	return village;
+    //Creating the arrays needed
+    var village = new Array(villageAmount);
+    for (var i = 0; i < villageAmount; i++) {
+        village[i] = new Array();
+    }
+    log(1, "Created arrays");
+    //log(village);
+    return village;
 };
 
 //Useful function to decode an URL. More info here: http://stackoverflow.com/questions/40740474/javascript-find-out-if-url-tag-matches/40740931
 
-window.decodeUrl = function decodeUrl(url) {  
-	var a = document.createElement('A');
-	function inner(url) {  
-		a.href = url;
-		return {
-			protocol: a.protocol,
-			hostname: a.hostname,
-			pathname: a.pathname,
-			search: a.search,
-			params: a.search.replace(/(^\?)/,'').split("&").
-				map(function(n){return n = n.split("="),
-				this[n[0]] = n[1],this}.bind({}))[0]
-		};
-	};
-	window.decodeUrl = inner;
-	return inner(url);
+window.decodeUrl = function decodeUrl(url) {
+    var a = document.createElement('A');
+    function inner(url) {
+        a.href = url;
+        return {
+            protocol: a.protocol,
+            hostname: a.hostname,
+            pathname: a.pathname,
+            search: a.search,
+            params: a.search.replace(/(^\?)/, '').split("&").
+                map(function (n) {
+                    return n = n.split("="),
+                        this[n[0]] = n[1], this
+                }.bind({}))[0]
+        };
+    };
+    window.decodeUrl = inner;
+    return inner(url);
 };
 
 /*
