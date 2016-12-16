@@ -39,6 +39,7 @@
  * - Add function calls for the non-premium buildings
  * - Write the fetching of the current units in a variable function
  * - Write the current units with their name in a 2D array
+ * - Add functionallity for churches
  *
  ** KNOWN BUGS:
  * - When an unit is finished the added column is removed
@@ -51,6 +52,9 @@ var trainingBarrack = [];
 var trainingStable = [];
 var trainingGarage = [];
 var currentUnits = [];
+
+var offenceNames = ["off", "offence"];
+var defenceNames = ["def", "defence"];
 
 var barrackUnits = ["spear", "sword", "axe", "archer"];
 var stableUnits = ["spy", "light", "marcher", "heavy"];
@@ -124,6 +128,28 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         getBarrackRecruiting();
         getStableRecruiting();
         getGarageRecruiting();
+        var group = getGroups();
+        var currentgroup;
+        log(1, "group.length: " + group.length);
+
+        for (var i = 0; i < group.length; i++) {
+            log(1, "Looking for: " + group[i]);
+            for (var j = 0; j < offenceNames.length; j++) {
+                if (group[i] === offenceNames[j]) {
+                    log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
+                    currentgroup = offenceNames[j];
+                    break;
+                }
+            }
+
+            for (var k = 0; k < defenceNames.length; k++) {
+                if (group[i] === defenceNames[k]) {
+                    log(1, "Found match! Group: " + group[i] + " defencenames: " + defenceNames[k]);
+                    currentgroup = defenceNames[k];
+                    break;
+                }
+            }
+        }
 
         var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
         log(1, "Amount of entries: " + tableLength);
@@ -131,9 +157,9 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         for (i = 1; i < tableLength + 1; i++) {
             var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(i - 1).text();
             var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-            var unit = $("#train_form > .vis > tbody > tr > td > a").hasClass()
-            currentUnits[i, ];
-            log(1, "Current units: " + currentUnits[i, textAfterHash]);
+            //var unit = $("#train_form > .vis > tbody > tr > td > a").hasClass()
+            //currentUnits[i, textAfterHash];
+            //log(1, "Current units: " + currentUnits[i, textAfterHash]);
 
             var displayText = offence[i - 1] - textAfterHash;
             $("#train_form > .vis > tbody > tr").eq(i).append("<td>" + displayText + "</td>");
@@ -300,6 +326,22 @@ function createRecruitArrays() {
     for (var l = 0; l < 2; l++) {
         currentUnits[l] = new Array(); //Add the 2nd array list
     }
+}
+
+function getGroups() {
+    try {
+        var tempgroup = jQuery("#content_value strong")[0] // get the dom object
+            .nextSibling // get the text node next to it
+            .textContent // get text content
+            .toLowerCase();
+        var group = tempgroup.replace(/\s+/g, '').split(",");
+        log(1, group[1]);
+        return group;
+    } catch (ex) {
+        log(1, ex);
+    }
+
+    
 }
 
 
