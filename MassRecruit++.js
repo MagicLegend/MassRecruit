@@ -52,6 +52,7 @@ var trainingBarrack = [];
 var trainingStable = [];
 var trainingGarage = [];
 var currentUnits = [];
+var obj = {};
 
 var offenceNames = ["off", "offence"];
 var defenceNames = ["def", "defence"];
@@ -62,12 +63,25 @@ var garageUnits = ["ram", "cata"];
 var offence = [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0];
 var defence = [7500, 8500, 0, 1000, 0, 0, 0, 0, 5, 0];
 
+//***Add in your custom arrays below***//
+//***DONT FORGET TO  CHANGE THE config.customGroupAmount VALUE!***//
+
+var customName1 = ["def1", "def2"]; //Names pattern that the script should look for
+var customUnits1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matched with that pattern
+var customName2 = ["off1", "off2"]; //Names pattern that the script should look for
+var customUnits2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matched with that pattern
+var customName3 = ["mix1", "mix2"]; //Names pattern that the script should look for
+var customUnits3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matched with that pattern
+
+
 //Setup:
 //var offence = [spear, sword, axe, archer, spy, light, marcher, heavy, ram, cata]
 
 var config = {
     debug: true,
-    level: 1 // 1: everything, 2: most things, 3: really limited things
+    level: 1, // 1: everything, 2: most things, 3: really limited things
+    defaultArrays: false,
+    customGroupAmount: 2
 };
 
 
@@ -132,22 +146,46 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         var currentgroup;
         log(1, "group.length: " + group.length);
 
-        for (var i = 0; i < group.length; i++) {
-            log(1, "Looking for: " + group[i]);
-            for (var j = 0; j < offenceNames.length; j++) {
-                if (group[i] === offenceNames[j]) {
-                    log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
-                    currentgroup = offenceNames[j];
-                    break;
+        if (config.defaultArrays) {
+            for (var i = 0; i < group.length; i++) {
+                log(1, "Looking for: " + group[i]);
+                for (var j = 0; j < offenceNames.length; j++) {
+                    if (group[i] === offenceNames[j]) {
+                        log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
+                        currentgroup = offenceNames[j];
+                        break;
+                    }
+                }
+
+                for (var k = 0; k < defenceNames.length; k++) {
+                    if (group[i] === defenceNames[k]) {
+                        log(1, "Found match! Group: " + group[i] + " defencenames: " + defenceNames[k]);
+                        currentgroup = defenceNames[k];
+                        break;
+                    }
                 }
             }
+        } else {
+            try {
+                var y = 1;
+                log(1, "group.length: " + group.length);
+                log(1, "config.customGroupAmount: " + config.customGroupAmount);
+                log(1, "['customName' + y].length: " + ['customName' + y].length);
+                log(1, "customName1.length: " + customName1.length);
 
-            for (var k = 0; k < defenceNames.length; k++) {
-                if (group[i] === defenceNames[k]) {
-                    log(1, "Found match! Group: " + group[i] + " defencenames: " + defenceNames[k]);
-                    currentgroup = defenceNames[k];
-                    break;
-                }
+
+                //for (var i = 0; i < group.length; i++) {
+                //    for (var j = 0; j < config.customGroupAmount; j++) {
+                //        for (var j = 0; k < ['custom' + j + 'Name'].length; k++) {
+                //            if (group[i] === ['custom' + j + 'name'][k]) {
+                //                log(1, "Found match! Group: " + group[i] + " name: " + ['custom' + j + 'name'][k]);
+                //                break;
+                //            }
+                //        }
+                //    }
+                //}
+            } catch (ex) {
+                log(1, ex);
             }
         }
 
@@ -340,8 +378,6 @@ function getGroups() {
     } catch (ex) {
         log(1, ex);
     }
-
-    
 }
 
 
