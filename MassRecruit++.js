@@ -40,6 +40,7 @@
  * - Write the fetching of the current units in a variable function
  * - Write the current units with their name in a 2D array
  * - Add functionallity for churches
+ * - Calculate every time a number/key is pressed for live stats
  *
  ** KNOWN BUGS:
  * - When an unit is finished the added column is removed
