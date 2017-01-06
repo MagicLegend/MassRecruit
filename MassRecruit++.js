@@ -67,6 +67,8 @@ var defence = [7500, 8500, 0, 1000, 0, 0, 0, 0, 5, 0];
 //***Add in your custom arrays below***//
 //***DONT FORGET TO  CHANGE THE config.customGroupAmount VALUE!***//
 
+var customNameTable = ["customName1", "custonName2", "customName3"];
+var customUnitsTable = ["customUnits1", "customUnits2", "customUnits3"];
 var customName1 = ["def1", "def2"]; //Names pattern that the script should look for
 var customUnits1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matched with that pattern
 var customName2 = ["off1", "off2"]; //Names pattern that the script should look for
@@ -81,8 +83,8 @@ var customUnits3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matche
 var config = {
     debug: true,
     level: 1, // 1: everything, 2: most things, 3: really limited things
-    defaultArrays: false,
-    customGroupAmount: 2
+    defaultArrays: true,
+    customGroupAmount: 3
 };
 
 
@@ -154,6 +156,48 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
                     if (group[i] === offenceNames[j]) {
                         log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
                         currentgroup = offenceNames[j];
+                        var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+                        log(1, "Amount of entries: " + tableLength);
+
+                        for (var l = 0; l < trainingBarrack.length; l++) {
+                            //Barrackloop
+
+                            log(1, barrackUnits.length);
+
+                            for (var j = 0; j < barrackUnits.length; j++) {
+                                logBarrack(1, j);
+                                logBarrack(1, "Looking for: " + trainingBarrack[j, 0]);
+                                if (trainingBarrack[j, 0] == barrackUnits[j]) {
+                                    //Match
+                                    switch (trainingBarrack[j, 0]) {
+                                        case "spear":
+                                            logBarrack(1, "Found: spear");
+                                            break;
+                                        case "sword":
+                                            logBarrack(1, "Found: sword");
+                                            break;
+                                        case "axe":
+                                            logBarrack(1, "Found: axe");
+                                            break;
+                                        case "archer":
+                                            logBarrack(1, "Found: archer");
+                                            break;
+                                        default: log(1, "Default case");
+
+                                    }
+                                }
+                            }
+                        }
+
+
+                        for (k = 1; k < tableLength + 1; k++) {
+                            var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k - 1).text()
+                            var textAfterHash = temp.substring(temp.indexOf('/') + 1); 
+
+                            var displayText = offence[k - 1] - textAfterHash;
+                            
+                            $("#train_form > .vis > tbody > tr").eq(k).append("<td>" + displayText + "</td>");
+                        }
                         break;
                     }
                 }
@@ -162,6 +206,7 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
                     if (group[i] === defenceNames[k]) {
                         log(1, "Found match! Group: " + group[i] + " defencenames: " + defenceNames[k]);
                         currentgroup = defenceNames[k];
+
                         break;
                     }
                 }
@@ -171,7 +216,7 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
                 var y = 1;
                 log(1, "group.length: " + group.length);
                 log(1, "config.customGroupAmount: " + config.customGroupAmount);
-                log(1, "['customName' + y].length: " + ['customName' + y].length);
+                log(1, "['customName' + y].length: " + [customNameTable[1]].length);
                 log(1, "customName1.length: " + customName1.length);
 
 
@@ -188,20 +233,6 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
             } catch (ex) {
                 log(1, ex);
             }
-        }
-
-        var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
-        log(1, "Amount of entries: " + tableLength);
-
-        for (i = 1; i < tableLength + 1; i++) {
-            var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(i - 1).text();
-            var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-            //var unit = $("#train_form > .vis > tbody > tr > td > a").hasClass()
-            //currentUnits[i, textAfterHash];
-            //log(1, "Current units: " + currentUnits[i, textAfterHash]);
-
-            var displayText = offence[i - 1] - textAfterHash;
-            $("#train_form > .vis > tbody > tr").eq(i).append("<td>" + displayText + "</td>");
         }
     });
 };
@@ -230,20 +261,20 @@ function getBarrackRecruiting() {
 
 
         //--[[Code for finding the list of recruiting units]]--
-        for (var j = 1; j < trainingLength + 1; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
+        for (var j = 0; j < trainingLength; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
             //log(1, "First for loop " + j);
             for (var i = 0; i < barrackUnits.length; i++) {
                 //log(1, "Entered for loop " + i);
                 var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > #trainorder_" + j + " > td > .unit_sprite").hasClass(barrackUnits[i]);
                 if (hasClassRest) {
                     var amountTroopsLeft = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > #trainorder_" + j + " > td").text().match(/\d+/);
-                    trainingBarrack[j, 0] = barrackUnits[i];
-                    trainingBarrack[j, 1] = amountTroopsLeft;
-                    logBarrack(1, "Unit " + j + " has type: " + trainingBarrack[j, 0]);
-                    logBarrack(1, "And has " + trainingBarrack[j, 1] + " units to do");
+                    trainingBarrack[j + 1, 0] = barrackUnits[i];
+                    trainingBarrack[j + 1, 1] = amountTroopsLeft;
+                    logBarrack(1, "Unit " + j + " has type: " + trainingBarrack[j + 1, 0]);
+                    logBarrack(1, "And has " + trainingBarrack[j + 1, 1] + " units to do");
                     logBarrack(1, "----------");
                 } else {
-                    //log(1, "Nope. Found type: " + barrackUnits[i]);
+                    //logBarrack(1, "Nope. Looked for type: " + barrackUnits[i]);
                 }
             }
         }
@@ -274,20 +305,20 @@ function getStableRecruiting() {
 
 
         //--[[Code for finding the list of recruiting units]]--
-        for (var j = 1; j < trainingLength + 1; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
+        for (var j = 0; j < trainingLength; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
             //log(1, "First for loop " + j);
             for (var i = 0; i < barrackUnits.length; i++) {
                 //log(1, "Entered for loop " + i);
                 var hasClassRest = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td > .unit_sprite").hasClass(stableUnits[i]);
                 if (hasClassRest) {
                     var amountTroopsLeft = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td").text().match(/\d+/);
-                    trainingStable[j, 0] = stableUnits[i];
-                    trainingStable[j, 1] = amountTroopsLeft;
-                    logStable(1, "Unit " + j + " has type: " + trainingStable[j, 0]);
-                    logStable(1, "And has " + trainingStable[j, 1] + " units to do");
+                    trainingStable[j + 1, 0] = stableUnits[i];
+                    trainingStable[j + 1, 1] = amountTroopsLeft;
+                    logStable(1, "Unit " + j + " has type: " + trainingStable[j + 1, 0]);
+                    logStable(1, "And has " + trainingStable[j + 1, 1] + " units to do");
                     logStable(1, "----------");
                 } else {
-                    //logStable(1, "Nope. Found type: " + stableUnits[i]);
+                    //logStable(1, "Nope. Looking for type: " + stableUnits[i]);
                 }
             }
         }
@@ -319,20 +350,20 @@ function getGarageRecruiting() {
 
 
         //--[[Code for finding the list of recruiting units]]--
-        for (var j = 1; j < trainingLength + 1; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
+        for (var j = 0; j < trainingLength; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
             //log(1, "First for loop " + j);
             for (var i = 0; i < garageUnits.length; i++) {
                 //log(1, "Entered for loop " + i);
                 var hasClassRest = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > #trainorder_" + j + " > td > .unit_sprite").hasClass(garageUnits[i]);
                 if (hasClassRest) {
                     var amountTroopsLeft = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > #trainorder_" + j + " > td").text().match(/\d+/);
-                    trainingGarage[j, 0] = garageUnits[i];
-                    trainingGarage[j, 1] = amountTroopsLeft;
-                    logGarage(1, "Unit " + j + " has type: " + trainingGarage[j, 0]);
-                    logGarage(1, "And has " + trainingGarage[j, 1] + " units to do");
+                    trainingGarage[j + 1, 0] = garageUnits[i];
+                    trainingGarage[j + 1, 1] = amountTroopsLeft;
+                    logGarage(1, "Unit " + j + " has type: " + trainingGarage[j + 1, 0]);
+                    logGarage(1, "And has " + trainingGarage[j + 1, 1] + " units to do");
                     logGarage(1, "----------");
                 } else {
-                    //logGarage(1, "Nope. Found type: " + GarageUnits[i]);
+                    //logGarage(1, "Nope. Looking for type: " + GarageUnits[i]);
                 }
             }
         }
