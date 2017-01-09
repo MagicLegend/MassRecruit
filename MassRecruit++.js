@@ -159,11 +159,12 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
                         var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
                         log(1, "Amount of entries: " + tableLength);
 
+
+                        var trainingBarrackLength = size(trainingBarrack);
+                        log(1, "trainingBarrackLength: " + trainingBarrackLength);
+
                         for (var l = 0; l < trainingBarrack.length; l++) {
                             //Barrackloop
-
-                            log(1, barrackUnits.length);
-
                             for (var j = 0; j < barrackUnits.length; j++) {
                                 logBarrack(1, j);
                                 logBarrack(1, "Looking for: " + trainingBarrack[j, 0]);
@@ -410,6 +411,16 @@ function getGroups() {
     } catch (ex) {
         log(1, ex);
     }
+}
+
+function size(ar) {
+    //http://stackoverflow.com/a/10237736/7193940
+    var row_count = ar.length;
+    var row_sizes = []
+    for (var i = 0; i < row_count; i++) {
+        row_sizes.push(ar[i].length)
+    }
+    return [row_sizes, Math.min.apply(null, row_sizes)]
 }
 
 
