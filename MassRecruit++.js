@@ -159,8 +159,8 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
                         var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
                         log(1, "Amount of entries: " + tableLength);
 
-                        
-                        var trainingBarrackLength = size(trainingBarrack);
+                        log(1, trainingBarrack);
+                        var trainingBarrackLength = arrayDimension(trainingBarrack);
                         log(1, "trainingBarrackLength: " + trainingBarrackLength);
 
                         for (var l = 0; l < trainingBarrackLength; l++) {
@@ -308,7 +308,7 @@ function getStableRecruiting() {
         //--[[Code for finding the list of recruiting units]]--
         for (var j = 0; j < trainingLength; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
             //log(1, "First for loop " + j);
-            for (var i = 0; i < barrackUnits.length; i++) {
+            for (var i = 0; i < stableUnits.length; i++) {
                 //log(1, "Entered for loop " + i);
                 var hasClassRest = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td > .unit_sprite").hasClass(stableUnits[i]);
                 if (hasClassRest) {
@@ -375,28 +375,44 @@ function getGarageRecruiting() {
 
 function createRecruitArrays() {
     var trainingLengthBarrack = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr").length; //-1 to account for the cancel everything button at the bottom.
-    trainingBarrack = new Array(trainingLengthBarrack);
-    for (var i = 0; i < 2; i++) {
-        trainingBarrack[i] = new Array(); //Add the 2nd array list
-    }
+    trainingBarrack = createArray(trainingLengthBarrack, trainingLengthBarrack);
+    //trainingBarrack = new Array(trainingLengthBarrack);
+    //for (var i = 0; i < 2; i++) {
+    //    trainingBarrack[i] = new Array(); //Add the 2nd array list
+    //}
 
     var trainingLengthStable = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > tr").length; //-1 to account for the cancel everything button at the bottom.
-    trainingStable = new Array(trainingLengthStable);
-    for (var j = 0; j < 2; j++) {
-        trainingStable[j] = new Array(); //Add the 2nd array list
-    }
+    trainingStable = createArray(trainingLengthStable, trainingLengthStable);
+    //trainingStable = new Array(trainingLengthStable);
+    //for (var j = 0; j < 2; j++) {
+    //    trainingStable[j] = new Array(); //Add the 2nd array list
+    //}
 
     var trainingLengthGarage = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > tr").length; //-1 to account for the cancel everything button at the bottom.
-    trainingGarage = new Array(trainingLengthStable);
-    for (var k = 0; k < 2; k++) {
-        trainingGarage[k] = new Array(); //Add the 2nd array list
-    }
+    trainingGarage = createArray(trainingLengthGarage, trainingLengthGarage);
+    //trainingGarage = new Array(trainingLengthStable);
+    //for (var k = 0; k < 2; k++) {
+    //    trainingGarage[k] = new Array(); //Add the 2nd array list
+    //}
 
     var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
     currentUnits - new Array(tableLength);
     for (var l = 0; l < 2; l++) {
         currentUnits[l] = new Array(); //Add the 2nd array list
     }
+}
+
+//http://stackoverflow.com/a/966938/7193940
+function createArray(length) {
+    var arr = new Array(length || 0),
+        i = length;
+
+    if (arguments.length > 1) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        while (i--) arr[length - 1 - i] = createArray.apply(this, args);
+    }
+
+    return arr;
 }
 
 function getGroups() {
@@ -423,6 +439,36 @@ function size(ar) {
     return [row_sizes, Math.min.apply(null, row_sizes)]
 }
 
+// Array dimension checker
+// Returns:
+//   false when array dimensions are different
+//   an Array when is rectangular 0d (i.e. an object) or >=1d
+function arrayDimension(a) {
+    // Make sure it is an array
+    if (a instanceof Array) {
+        // First element is an array
+        var sublength = arrayDimension(a[0]);
+        if (sublength === false) {
+            // This is a linear Array.
+            return [a.length];
+        } else {
+            // Compare every element to make sure they are of the same dimensions
+            for (var i = 1; i < a.length; i++) {
+                var _sublength = arrayDimension(a[i]);
+                // HACK: compare arrays...
+                if (_sublength === false || sublength.join(",") != _sublength.join(",")) {
+                    // If the dimension is different (i.e. not rectangular)
+                    return false;
+                }
+            }
+            // OK now it is "rectangular" (could you call 3d "rectangular"?)
+            return [a.length].concat(sublength);
+        }
+    } else {
+        // Not an array
+        return [];
+    }
+}
 
 //--[[Functions for the mass-recruit function]]--
 
