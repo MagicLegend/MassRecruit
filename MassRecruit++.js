@@ -159,18 +159,18 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
                         var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
                         log(1, "Amount of entries: " + tableLength);
 
-
+                        
                         var trainingBarrackLength = size(trainingBarrack);
                         log(1, "trainingBarrackLength: " + trainingBarrackLength);
 
-                        for (var l = 0; l < trainingBarrack.length; l++) {
+                        for (var l = 0; l < trainingBarrackLength; l++) {
                             //Barrackloop
-                            for (var j = 0; j < barrackUnits.length; j++) {
-                                logBarrack(1, j);
-                                logBarrack(1, "Looking for: " + trainingBarrack[j, 0]);
-                                if (trainingBarrack[j, 0] == barrackUnits[j]) {
+                            for (var k = 0; k < barrackUnits.length; k++) {
+                                logBarrack(1, k);
+                                logBarrack(1, "Looking for: " + trainingBarrack[k, 0]);
+                                if (trainingBarrack[k, 0] == barrackUnits[k]) {
                                     //Match
-                                    switch (trainingBarrack[j, 0]) {
+                                    switch (trainingBarrack[k, 0]) {
                                         case "spear":
                                             logBarrack(1, "Found: spear");
                                             break;
