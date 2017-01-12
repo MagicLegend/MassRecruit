@@ -152,7 +152,7 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
             for (var i = 0; i < group.length; i++) {
                 log(1, "Looking for: " + group[i]);
                 for (var j = 0; j < offenceNames.length; j++) {
-                    if (group[i] === offenceNames[j]) {
+                    if (group[i] === offenceNames[j] || group[i] === defenceNames[j]) {
                         log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
                         currentgroup = offenceNames[j];
                         var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
@@ -217,7 +217,7 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
                         }
 
                         for (var l = 0; l < trainingGarage.length; l++) {
-                            //Stableloop
+                            //Garageloop
                             for (var k = 0; k < garageUnits.length; k++) {
                                 var tempGarage = trainingGarage[l].split(","); //0 = name; 1 = amount;
                                 if (tempGarage[0] == garageUnits[k]) {
