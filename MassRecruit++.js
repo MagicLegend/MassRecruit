@@ -148,7 +148,11 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
 
     $(".btn-recruit").click(function () {
         log(1, "Clicked button");
-        setTimeout(main(), 1000);
+        if (!$(".todo").length) {
+            createRow();
+        }
+        currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        setTimeout(main, 500);
         //main();
     })
 
