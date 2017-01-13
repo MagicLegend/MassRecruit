@@ -48,6 +48,7 @@
 
 //Variable stuff:
 var villageAmount;
+var tableLength;
 var village = [];
 var trainingBarrack = [];
 var trainingStable = [];
@@ -61,8 +62,9 @@ var defenceNames = ["def", "defence"];
 var barrackUnits = ["spear", "sword", "axe", "archer"];
 var stableUnits = ["spy", "light", "marcher", "heavy"];
 var garageUnits = ["ram", "cata"];
+var allUnits = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "heavy", "ram", "cata"];
 var offence = [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0];
-var defence = [7500, 8500, 0, 1000, 0, 0, 0, 0, 5, 0];
+var defence = [7500, 8500, 0, 1000, 0, 0, 0, 550, 5, 0];
 
 //***Add in your custom arrays below***//
 //***DONT FORGET TO  CHANGE THE config.customGroupAmount VALUE!***//
@@ -87,6 +89,7 @@ var config = {
     customGroupAmount: 3
 };
 
+//http://stackoverflow.com/questions/7729382/how-to-make-a-non-blocking-sleep-in-javascript-jquery
 
 //Code stuff:
 
@@ -139,153 +142,93 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
 
     $(function () {
         log(1, "Screen = train");
-        $("#train_form > .vis > tbody > tr:not(.row_a, .row_b)").first().append("<th style='width: 80px'>To Do:</th>");
-        log(1, "Added heading");
-        getBarrackRecruiting();
-        getStableRecruiting();
-        getGarageRecruiting();
-        var group = getGroups();
-        var currentgroup;
-        log(1, "group.length: " + group.length);
+        createRow();
+        main();
+    });
 
-        if (config.defaultArrays) {
-            for (var i = 0; i < group.length; i++) {
-                log(1, "Looking for: " + group[i]);
-                for (var j = 0; j < offenceNames.length; j++) {
-                    if (group[i] === offenceNames[j] || group[i] === defenceNames[j]) {
-                        log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
-                        currentgroup = offenceNames[j];
-                        var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
-                        log(1, "Amount of entries: " + tableLength);
+    $(".btn-recruit").click(function () {
+        log(1, "Clicked button");
+        setTimeout(main(), 1000);
+        //main();
+    })
 
-                        log(1, trainingBarrack);
+};
 
-                        for (var l = 0; l < trainingBarrack.length; l++) {
-                            //Barrackloop
-                            for (var k = 0; k < barrackUnits.length; k++) {
-                                var tempBarrack = trainingBarrack[l].split(","); //0 = name; 1 = amount;
-                                if (tempBarrack[0] == barrackUnits[k]) {
-                                    //Match
-                                    switch (tempBarrack[0]) {
-                                        case "spear":
-                                            logBarrack(1, "Found: spear");
-                                            break;
-                                        case "sword":
-                                            logBarrack(1, "Found: sword");
-                                            break;
-                                        case "axe":
-                                            logBarrack(1, "Found: axe");
-                                            break;
-                                        case "archer":
-                                            logBarrack(1, "Found: archer");
-                                            break;
-                                        default: logBarrack(1, "Default case");
-                                            break;
-                                    }
-                                currentUnits[k] = currentUnits[k] + parseInt(tempBarrack[1], 10);
-                                logBarrack(1, currentUnits[k]);
-                                }
-                            }
-                        }
+function main() {
+    getBarrackRecruiting();
+    getStableRecruiting();
+    getGarageRecruiting();
+    var group = getGroups();
+    var currentgroup;
+    log(1, "group.length: " + group.length);
 
-                        for (var l = 0; l < trainingStable.length; l++) {
-                            //Stableloop
-                            for (var k = 0; k < stableUnits.length; k++) {
-                                var tempStable = trainingStable[l].split(","); //0 = name; 1 = amount;
-                                if (tempStable[0] == stableUnits[k]) {
-                                    //Match
-                                    switch (tempStable[0]) {
-                                        case "spy":
-                                            logStable(1, "Found: spy");
-                                            break;
-                                        case "light":
-                                            logStable(1, "Found: light");
-                                            break;
-                                        case "marcher":
-                                            logStable(1, "Found: marcher");
-                                            break;
-                                        case "heavy":
-                                            logStable(1, "Found: heavy");
-                                            break;
-                                        default: logStable(1, "Default case");
-                                            break;
-                                    }
-                                    currentUnits[k + 4] = currentUnits[k + 4] + parseInt(tempStable[1], 10);
-                                    logStable(1, currentUnits[k + 4]);
-                                }
-                            }
-                        }
+    if (config.defaultArrays) {
+        for (var i = 0; i < group.length; i++) {
+            log(1, "Looking for: " + group[i]);
+            for (var j = 0; j < offenceNames.length; j++) {
+                if (group[i] === offenceNames[j]) {
+                    log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
+                    currentgroup = offenceNames[j];
+                    tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+                    log(1, "Amount of entries: " + tableLength);
 
-                        for (var l = 0; l < trainingGarage.length; l++) {
-                            //Garageloop
-                            for (var k = 0; k < garageUnits.length; k++) {
-                                var tempGarage = trainingGarage[l].split(","); //0 = name; 1 = amount;
-                                if (tempGarage[0] == garageUnits[k]) {
-                                    //Match
-                                    switch (tempGarage[0]) {
-                                        case "ram":
-                                            logGarage(1, "Found: ram");
-                                            break;
-                                        case "cata":
-                                            logGarage(1, "Found: cata");
-                                            break;
-                                        default: logGarage(1, "Default case");
-                                            break;
-                                    }
-                                    currentUnits[k + 8] = currentUnits[k + 8] + parseInt(tempGarage[1], 10);
-                                    logGarage(1, currentUnits[k + 8]);
-                                }
-                            }
-                        }
+                    log(1, trainingBarrack);
 
-                        log(1, currentUnits);
+                    calcTroops();
 
-                        for (k = 1; k < tableLength + 1; k++) {
-                            var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k - 1).text()
-                            var textAfterHash = temp.substring(temp.indexOf('/') + 1); 
+                    log(1, currentUnits);
 
-                            var displayText = offence[k - 1] - textAfterHash - currentUnits[k - 1];
-                            
-                            $("#train_form > .vis > tbody > tr").eq(k).append("<td>" + displayText + "</td>");
-                        }
-                        break;
+                    for (k = 0; k < tableLength; k++) {
+                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text()
+                        var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+
+                        var displayText = offence[k] - textAfterHash - currentUnits[k];
+
+                        $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
                     }
-                }
-
-                for (var k = 0; k < defenceNames.length; k++) {
-                    if (group[i] === defenceNames[k]) {
-                        log(1, "Found match! Group: " + group[i] + " defencenames: " + defenceNames[k]);
-                        currentgroup = defenceNames[k];
-
-                        break;
-                    }
+                    break;
                 }
             }
-        } else {
-            try {
-                var y = 1;
-                log(1, "group.length: " + group.length);
-                log(1, "config.customGroupAmount: " + config.customGroupAmount);
-                log(1, "['customName' + y].length: " + [customNameTable[1]].length);
-                log(1, "customName1.length: " + customName1.length);
 
+            for (var k = 0; k < defenceNames.length; k++) {
+                if (group[i] === defenceNames[k]) {
+                    log(1, "Found match! Group: " + group[i] + " defencenames: " + defenceNames[k]);
+                    currentgroup = defenceNames[k];
 
-                //for (var i = 0; i < group.length; i++) {
-                //    for (var j = 0; j < config.customGroupAmount; j++) {
-                //        for (var j = 0; k < ['custom' + j + 'Name'].length; k++) {
-                //            if (group[i] === ['custom' + j + 'name'][k]) {
-                //                log(1, "Found match! Group: " + group[i] + " name: " + ['custom' + j + 'name'][k]);
-                //                break;
-                //            }
-                //        }
-                //    }
-                //}
-            } catch (ex) {
-                log(1, ex);
+                    var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+                    log(1, "Amount of entries: " + tableLength);
+
+                    log(1, trainingBarrack);
+
+                    calcTroops();
+
+                    log(1, currentUnits);
+
+                    for (k = 0; k < tableLength; k++) {
+                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text()
+                        var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+
+                        var displayText = defence[k] - textAfterHash - currentUnits[k];
+
+                        $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
+                    }
+
+                    break;
+                }
             }
         }
-    });
-};
+    } else {
+        try {
+            var y = 1;
+            log(1, "group.length: " + group.length);
+            log(1, "config.customGroupAmount: " + config.customGroupAmount);
+            log(1, "['customName' + y].length: " + [customNameTable[1]].length);
+            log(1, "customName1.length: " + customName1.length);
+        } catch (ex) {
+            log(1, ex);
+        }
+    }
+}
 
 function getBarrackRecruiting() {
     logBarrack(1, "Entered barrack");
@@ -422,48 +365,6 @@ function getGarageRecruiting() {
     }
 }
 
-function createRecruitArrays() {
-    var trainingLengthBarrack = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr").length; //-1 to account for the cancel everything button at the bottom.
-    //trainingBarrack = createArray(trainingLengthBarrack, trainingLengthBarrack);
-    //trainingBarrack = new Array(trainingLengthBarrack);
-    //for (var i = 0; i < 2; i++) {
-    //    trainingBarrack[i] = new Array(); //Add the 2nd array list
-    //}
-
-    var trainingLengthStable = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > tr").length; //-1 to account for the cancel everything button at the bottom.
-    //trainingStable = createArray(trainingLengthStable, trainingLengthStable);
-    //trainingStable = new Array(trainingLengthStable);
-    //for (var j = 0; j < 2; j++) {
-    //    trainingStable[j] = new Array(); //Add the 2nd array list
-    //}
-
-    var trainingLengthGarage = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > tr").length; //-1 to account for the cancel everything button at the bottom.
-    //trainingGarage = createArray(trainingLengthGarage, trainingLengthGarage);
-    //trainingGarage = new Array(trainingLengthStable);
-    //for (var k = 0; k < 2; k++) {
-    //    trainingGarage[k] = new Array(); //Add the 2nd array list
-    //}
-
-    var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
-    //currentUnits - new Array(tableLength);
-    //for (var l = 0; l < 2; l++) {
-    //    currentUnits[l] = new Array(); //Add the 2nd array list
-    //}
-}
-
-//http://stackoverflow.com/a/966938/7193940
-function createArray(length) {
-    var arr = new Array(length || 0),
-        i = length;
-
-    if (arguments.length > 1) {
-        var args = Array.prototype.slice.call(arguments, 1);
-        while (i--) arr[length - 1 - i] = createArray.apply(this, args);
-    }
-
-    return arr;
-}
-
 function getGroups() {
     try {
         var tempgroup = jQuery("#content_value strong")[0] // get the dom object
@@ -478,47 +379,102 @@ function getGroups() {
     }
 }
 
-function size(ar) {
-    //http://stackoverflow.com/a/10237736/7193940
-    var row_count = ar.length;
-    var row_sizes = []
-    for (var i = 0; i < row_count; i++) {
-        row_sizes.push(ar[i].length)
-    }
-    return [row_sizes, Math.min.apply(null, row_sizes)]
-}
-
-// Array dimension checker
-// Returns:
-//   false when array dimensions are different
-//   an Array when is rectangular 0d (i.e. an object) or >=1d
-function arrayDimension(a) {
-    // Make sure it is an array
-    if (a instanceof Array) {
-        // First element is an array
-        var sublength = arrayDimension(a[0]);
-        if (sublength === false) {
-            // This is a linear Array.
-            return [a.length];
-        } else {
-            // Compare every element to make sure they are of the same dimensions
-            for (var i = 1; i < a.length; i++) {
-                var _sublength = arrayDimension(a[i]);
-                // HACK: compare arrays...
-                if (_sublength === false || sublength.join(",") != _sublength.join(",")) {
-                    // If the dimension is different (i.e. not rectangular)
-                    return false;
+function calcTroops() {
+    for (var l = 0; l < trainingBarrack.length; l++) {
+        //Barrackloop
+        for (var k = 0; k < barrackUnits.length; k++) {
+            var tempBarrack = trainingBarrack[l].split(","); //0 = name; 1 = amount;
+            if (tempBarrack[0] == barrackUnits[k]) {
+                //Match
+                switch (tempBarrack[0]) {
+                    case "spear":
+                        logBarrack(1, "Found: spear");
+                        break;
+                    case "sword":
+                        logBarrack(1, "Found: sword");
+                        break;
+                    case "axe":
+                        logBarrack(1, "Found: axe");
+                        break;
+                    case "archer":
+                        logBarrack(1, "Found: archer");
+                        break;
+                    default: logBarrack(1, "Default case");
+                        break;
                 }
+                currentUnits[k] = currentUnits[k] + parseInt(tempBarrack[1], 10);
+                logBarrack(1, currentUnits[k]);
             }
-            // OK now it is "rectangular" (could you call 3d "rectangular"?)
-            return [a.length].concat(sublength);
         }
-    } else {
-        // Not an array
-        return [];
+    }
+
+    for (var l = 0; l < trainingStable.length; l++) {
+        //Stableloop
+        for (var k = 0; k < stableUnits.length; k++) {
+            var tempStable = trainingStable[l].split(","); //0 = name; 1 = amount;
+            if (tempStable[0] == stableUnits[k]) {
+                //Match
+                switch (tempStable[0]) {
+                    case "spy":
+                        logStable(1, "Found: spy");
+                        break;
+                    case "light":
+                        logStable(1, "Found: light");
+                        break;
+                    case "marcher":
+                        logStable(1, "Found: marcher");
+                        break;
+                    case "heavy":
+                        logStable(1, "Found: heavy");
+                        break;
+                    default: logStable(1, "Default case");
+                        break;
+                }
+                currentUnits[k + 4] = currentUnits[k + 4] + parseInt(tempStable[1], 10);
+                logStable(1, currentUnits[k + 4]);
+            }
+        }
+    }
+
+    for (var l = 0; l < trainingGarage.length; l++) {
+        //Garageloop
+        for (var k = 0; k < garageUnits.length; k++) {
+            var tempGarage = trainingGarage[l].split(","); //0 = name; 1 = amount;
+            if (tempGarage[0] == garageUnits[k]) {
+                //Match
+                switch (tempGarage[0]) {
+                    case "ram":
+                        logGarage(1, "Found: ram");
+                        break;
+                    case "cata":
+                        logGarage(1, "Found: cata");
+                        break;
+                    default: logGarage(1, "Default case");
+                        break;
+                }
+                currentUnits[k + 8] = currentUnits[k + 8] + parseInt(tempGarage[1], 10);
+                logGarage(1, currentUnits[k + 8]);
+            }
+        }
     }
 }
 
+function createRow() {
+    if (!$(".todo").length) {
+        $("#train_form > .vis > tbody > tr:not(.row_a, .row_b)").first().append("<th class='todo' style='width: 80px'>To Do:</th>");
+        log(1, "Added heading");
+    } else {
+        log(1, "Heading exists");
+    }
+
+    tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+
+    for (k = 1; k < tableLength + 1; k++) { //+1 to account for the header
+        $("#train_form > .vis > tbody > tr").eq(k).append("<td class = massrecruitplusplus " + allUnits[k] + ">Filler!</td>");
+    }
+
+    //$("#train_form > .vis > tbody > tr").eq(k).append("<td class = massrecruitplusplus " + allUnits[k] + ">Filler!</td>");
+}
 //--[[Functions for the mass-recruit function]]--
 
 function findVillageAmount() {
