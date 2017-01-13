@@ -66,27 +66,10 @@ var allUnits = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "h
 var offence = [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0];
 var defence = [7500, 8500, 0, 1000, 0, 0, 0, 550, 5, 0];
 
-//***Add in your custom arrays below***//
-//***DONT FORGET TO  CHANGE THE config.customGroupAmount VALUE!***//
-
-var customNameTable = ["customName1", "custonName2", "customName3"];
-var customUnitsTable = ["customUnits1", "customUnits2", "customUnits3"];
-var customName1 = ["def1", "def2"]; //Names pattern that the script should look for
-var customUnits1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matched with that pattern
-var customName2 = ["off1", "off2"]; //Names pattern that the script should look for
-var customUnits2 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matched with that pattern
-var customName3 = ["mix1", "mix2"]; //Names pattern that the script should look for
-var customUnits3 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; //Units that should be matched with that pattern
-
-
-//Setup:
-//var offence = [spear, sword, axe, archer, spy, light, marcher, heavy, ram, cata]
-
 var config = {
     debug: true,
     level: 1, // 1: everything, 2: most things, 3: really limited things
-    defaultArrays: true,
-    customGroupAmount: 3
+    defaultArrays: true
 };
 
 //http://stackoverflow.com/questions/7729382/how-to-make-a-non-blocking-sleep-in-javascript-jquery
@@ -153,7 +136,6 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         }
         currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         setTimeout(main, 500);
-        //main();
     })
 
 };
@@ -222,15 +204,6 @@ function main() {
             }
         }
     } else {
-        try {
-            var y = 1;
-            log(1, "group.length: " + group.length);
-            log(1, "config.customGroupAmount: " + config.customGroupAmount);
-            log(1, "['customName' + y].length: " + [customNameTable[1]].length);
-            log(1, "customName1.length: " + customName1.length);
-        } catch (ex) {
-            log(1, ex);
-        }
     }
 }
 
@@ -238,7 +211,6 @@ function getBarrackRecruiting() {
     logBarrack(1, "Entered barrack");
     try {
         var trainingLength = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > tr").length; //-1 to account for the cancel everything button at the bottom.
-        //logBarrack(1, "barrackunits.length: " + barrackUnits.length);
         logBarrack(1, "trainingLength: " + trainingLength);
 
 
@@ -476,9 +448,8 @@ function createRow() {
     for (k = 1; k < tableLength + 1; k++) { //+1 to account for the header
         $("#train_form > .vis > tbody > tr").eq(k).append("<td class = massrecruitplusplus " + allUnits[k] + ">Filler!</td>");
     }
-
-    //$("#train_form > .vis > tbody > tr").eq(k).append("<td class = massrecruitplusplus " + allUnits[k] + ">Filler!</td>");
 }
+
 //--[[Functions for the mass-recruit function]]--
 
 function findVillageAmount() {
