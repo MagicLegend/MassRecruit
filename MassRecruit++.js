@@ -82,7 +82,7 @@ function log(lvl, logmsg) {
             console.log("Ge: " + logmsg);
         }
     }
-};
+}
 
 function logBarrack(lvl, logmsg) {
     if (config.debug) {
@@ -90,7 +90,7 @@ function logBarrack(lvl, logmsg) {
             console.log("B: " + logmsg);
         }
     }
-};
+}
 
 function logStable(lvl, logmsg) {
     if (config.debug) {
@@ -98,7 +98,7 @@ function logStable(lvl, logmsg) {
             console.log("S: " + logmsg);
         }
     }
-};
+}
 
 function logGarage(lvl, logmsg) {
     if (config.debug) {
@@ -106,7 +106,7 @@ function logGarage(lvl, logmsg) {
             console.log("G: " + logmsg);
         }
     }
-};
+}
 
 if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=mass/)) {
     log(1, "Href match > mode=mass");
@@ -118,7 +118,7 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
             findVillages();
         });
     });
-};
+}
 
 if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=train/)) {
     log(1, "Href match > mode=train");
@@ -136,9 +136,9 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         }
         currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         setTimeout(main, 500);
-    })
+    });
 
-};
+}
 
 function main() {
     getBarrackRecruiting();
@@ -165,7 +165,7 @@ function main() {
                     log(1, currentUnits);
 
                     for (k = 0; k < tableLength; k++) {
-                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text()
+                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
                         var textAfterHash = temp.substring(temp.indexOf('/') + 1);
 
                         var displayText = offence[k] - textAfterHash - currentUnits[k];
@@ -191,7 +191,7 @@ function main() {
                     log(1, currentUnits);
 
                     for (k = 0; k < tableLength; k++) {
-                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text()
+                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
                         var textAfterHash = temp.substring(temp.indexOf('/') + 1);
 
                         var displayText = defence[k] - textAfterHash - currentUnits[k];
@@ -403,7 +403,8 @@ function calcTroops() {
                     case "heavy":
                         logStable(1, "Found: heavy");
                         break;
-                    default: logStable(1, "Default case");
+                    default:
+                        logStable(1, "Default case");
                         break;
                 }
                 currentUnits[k + 4] = currentUnits[k + 4] + parseInt(tempStable[1], 10);
@@ -457,7 +458,7 @@ function findVillageAmount() {
     var villageAmountStr = $('#mass_train_table').find("th:eq(0)").text();
     villageAmount = /[0-9]{1,}/.exec(villageAmountStr);
     log(3, "Amount of villages: " + villageAmount);
-};
+}
 
 function findVillages() {
     var village = createArrays();
@@ -486,8 +487,8 @@ function findVillages() {
             log(3, "Changed tempVillageAmount to: " + tempVillageAmount);
         }
         log(2, "-----------------------------------");
-    };
-};
+    }
+}
 
 function createArrays() {
     //Creating the arrays needed
@@ -498,7 +499,7 @@ function createArrays() {
     log(1, "Created arrays");
     //log(village);
     return village;
-};
+}
 
 //Useful function to decode an URL. More info here: http://stackoverflow.com/questions/40740474/javascript-find-out-if-url-tag-matches/40740931
 
@@ -516,21 +517,17 @@ window.decodeUrl = function decodeUrl(url) {
                     return n = n.split("="),
                         this[n[0]] = n[1], this
                 }.bind({}))[0]
-        };
-    };
+        }
+    }
     window.decodeUrl = inner;
     return inner(url);
-};
+}
 
 /*
 USAGE:
-
 var url = 'https://nlp2.tribalwars.nl/game.php?village=171817&screen=train';
-
 var durl = decodeUrl(url);
-
 console.log(durl);
-
 console.log(
 	'Are we game & train : ' + 
 	((durl.pathname === '/game.php') &&
