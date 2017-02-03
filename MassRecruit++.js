@@ -61,8 +61,8 @@ var defenceNames = ["def", "defence"];
 
 var barrackUnits = ["spear", "sword", "axe", "archer"];
 var stableUnits = ["spy", "light", "marcher", "heavy"];
-var garageUnits = ["ram", "cata"];
-var allUnits = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "heavy", "ram", "cata"];
+var garageUnits = ["ram", "catapult"];
+var allUnits = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "heavy", "ram", "catapult"];
 var offence = [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0];
 var defence = [7500, 8500, 0, 1000, 0, 0, 0, 550, 5, 0];
 
@@ -137,7 +137,14 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         setTimeout(main, 500);
     });
+}
 
+if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=barracks/)) {
+	log(1, "Href match > barracks");
+
+	$(function () {
+		createRow();
+	})
 }
 
 function main() {
@@ -159,6 +166,7 @@ function main() {
                     log(1, "Amount of entries: " + tableLength);
 
                     log(1, trainingBarrack);
+                    log(1, currentUnits);
 
                     calcTroops();
 
@@ -332,7 +340,7 @@ function getGarageRecruiting() {
                     logGarage(1, "And has " + amountTroopsLeft + " units to do");
                     logGarage(1, "----------");
                 } else {
-                    //logGarage(1, "Nope. Looking for type: " + GarageUnits[i]);
+                    logGarage(1, "Nope. Looking for type: " + garageUnits[i]);
                 }
             }
         }
@@ -363,16 +371,16 @@ function calcTroops() {
             if (tempBarrack[0] == barrackUnits[k]) {
                 //Match
                 switch (tempBarrack[0]) {
-                    case "spear":
+                    case barrackUnits[0]:
                         logBarrack(1, "Found: spear");
                         break;
-                    case "sword":
+                    case barrackUnits[1]:
                         logBarrack(1, "Found: sword");
                         break;
-                    case "axe":
+                    case barrackUnits[2]:
                         logBarrack(1, "Found: axe");
                         break;
-                    case "archer":
+                    case barrackUnits[3]:
                         logBarrack(1, "Found: archer");
                         break;
                     default: logBarrack(1, "Default case");
@@ -391,16 +399,16 @@ function calcTroops() {
             if (tempStable[0] == stableUnits[k]) {
                 //Match
                 switch (tempStable[0]) {
-                    case "spy":
+                    case stableUnits[0]:
                         logStable(1, "Found: spy");
                         break;
-                    case "light":
+                    case stableUnits[1]:
                         logStable(1, "Found: light");
                         break;
-                    case "marcher":
+                    case stableUnits[2]:
                         logStable(1, "Found: marcher");
                         break;
-                    case "heavy":
+                    case stalbeUnits[3]:
                         logStable(1, "Found: heavy");
                         break;
                     default:
@@ -420,17 +428,17 @@ function calcTroops() {
             if (tempGarage[0] == garageUnits[k]) {
                 //Match
                 switch (tempGarage[0]) {
-                    case "ram":
+                    case garageUnits[0]:
                         logGarage(1, "Found: ram");
                         break;
-                    case "cata":
-                        logGarage(1, "Found: cata");
+                    case garageUnits[1]:
+                        logGarage(1, "Found: catapult");
                         break;
                     default: logGarage(1, "Default case");
                         break;
                 }
                 currentUnits[k + 8] = currentUnits[k + 8] + parseInt(tempGarage[1], 10);
-                logGarage(1, currentUnits[k + 8]);
+                logGarage(1, "garageloop " + currentUnits[k + 7]);
             }
         }
     }
