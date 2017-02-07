@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name			MassRecruit++
 // @namespace		http://tampermonkey.net/
-// @version			0.2
-// @description		Improves the TW messagenames.
+// @version			0.3
+// @description		Improves the recruit function with some automatic calculations
 // @author			MagicLegend
 // @grant			none
 // @include			https://nl*.tribalwars.nl/game.php*
@@ -15,6 +15,7 @@
  *
  * v0.1		Initial work, trying some stuff
  * v0.2		Now works for the offence category
+ * v0.3     The script now works for most cases
  */
 
 /** IDEA:
@@ -33,12 +34,8 @@
  * - Add message if the URL is wrong (no "&mode=train&" on the URL)
  * - Add option to add new groupnames that will recognize patterns
  * - Add button to add new patterns
- * - Save patterns to a cookie?
- * - Read which units are in recruitment, and subtract them from the To Do
  * - Add a little bit of documentation on the github page
- * - Add function calls for the non-premium buildings
  * - Write the fetching of the current units in a variable function
- * - Write the current units with their name in a 2D array
  * - Add functionallity for churches
  * - Calculate every time a number/key is pressed for live stats
  *
@@ -53,26 +50,47 @@ var village = [];
 var trainingBarrack = [];
 var trainingStable = [];
 var trainingGarage = [];
+var names = [];
+var units = [];
 var currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-var obj = {};
-
-var offenceNames = ["off", "offence"];
-var defenceNames = ["def", "defence"];
 
 var barrackUnits = ["spear", "sword", "axe", "archer"];
 var stableUnits = ["spy", "light", "marcher", "heavy"];
 var garageUnits = ["ram", "catapult"];
 var allUnits = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "heavy", "ram", "catapult"];
-var offence = [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0];
-var defence = [7500, 8500, 0, 1000, 0, 0, 0, 550, 5, 0];
+
+/**
+ * Keywords that the script should look for. Note that the arrays with names has the same name as the arrays with counts, but has 'Names' after it.
+ * When adding new names make sure your formatting is correct and that you update the amountOfArrays value, otherwise it will throw errors at you like crazy!
+ */
+
+var names = {
+    offence: ["off", "offence"],
+    defence: ["def", "defence", "deff"],
+    church1: ["kerk-1"],
+    church2: ["kerk-2"],
+    church3: ["kerk-3"],
+    custom1: ["custom1"]
+};
+
+var units = {
+    offence: [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0],
+    defence: [7500, 8500, 0, 1000, 0, 0, 0, 550, 5, 0],
+    church1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    church2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    church3: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    custom1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+};
+
+var content = {
+    offence: [["off", "offence"], [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0]],
+}
 
 var config = {
     debug: true,
     level: 1, // 1: everything, 2: most things, 3: really limited things
     defaultArrays: true
 };
-
-//http://stackoverflow.com/questions/7729382/how-to-make-a-non-blocking-sleep-in-javascript-jquery
 
 //Code stuff:
 
@@ -139,14 +157,6 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
     });
 }
 
-if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=barracks/)) {
-	log(1, "Href match > barracks");
-
-	$(function () {
-		createRow();
-	})
-}
-
 function main() {
     getBarrackRecruiting();
     getStableRecruiting();
@@ -158,58 +168,39 @@ function main() {
     if (config.defaultArrays) {
         for (var i = 0; i < group.length; i++) {
             log(1, "Looking for: " + group[i]);
-            for (var j = 0; j < offenceNames.length; j++) {
-                if (group[i] === offenceNames[j]) {
-                    log(1, "Found match! Group: " + group[i] + " offencenames: " + offenceNames[j]);
-                    currentgroup = offenceNames[j];
-                    tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
-                    log(1, "Amount of entries: " + tableLength);
+            //Add tempnames, loop through all the arrays
 
-                    log(1, trainingBarrack);
-                    log(1, currentUnits);
+            $.each(names, function (index, value) {
 
-                    calcTroops();
+                for (var j = 0; j < value.length; j++) {
+                    if (group[i] === value[j]) {
+                        log(1, "Found match! Group: " + group[i] + " name: " + value[j]);
+                        currentgroup = value[j];
+                        tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+                        log(1, "Amount of entries: " + tableLength);
 
-                    log(1, currentUnits);
+                        log(1, trainingBarrack);
+                        log(1, currentUnits);
 
-                    for (k = 0; k < tableLength; k++) {
-                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
-                        var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+                        calcTroops();
 
-                        var displayText = offence[k] - textAfterHash - currentUnits[k];
+                        log(1, currentUnits);
 
-                        $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
+                        for (k = 0; k < tableLength; k++) {
+                            var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
+                            var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+                            var unitsValue = units[value[j]];
+                            log(1, "value: " + value[j]);
+                            log(1, unitsValue);
+                            var displayText = units[value[j]][k] - textAfterHash - currentUnits[k];
+
+                            $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
 
-            for (var k = 0; k < defenceNames.length; k++) {
-                if (group[i] === defenceNames[k]) {
-                    log(1, "Found match! Group: " + group[i] + " defencenames: " + defenceNames[k]);
-                    currentgroup = defenceNames[k];
-
-                    var tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
-                    log(1, "Amount of entries: " + tableLength);
-
-                    log(1, trainingBarrack);
-
-                    calcTroops();
-
-                    log(1, currentUnits);
-
-                    for (k = 0; k < tableLength; k++) {
-                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
-                        var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-
-                        var displayText = defence[k] - textAfterHash - currentUnits[k];
-
-                        $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
-                    }
-
-                    break;
-                }
-            }
+            });
         }
     } else {
     }
@@ -408,7 +399,7 @@ function calcTroops() {
                     case stableUnits[2]:
                         logStable(1, "Found: marcher");
                         break;
-                    case stalbeUnits[3]:
+                    case stableUnits[3]:
                         logStable(1, "Found: heavy");
                         break;
                     default:
