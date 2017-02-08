@@ -82,14 +82,9 @@ var units = {
     custom1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 };
 
-var content = {
-    offence: [["off", "offence"], [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0]],
-}
-
 var config = {
     debug: true,
     level: 1, // 1: everything, 2: most things, 3: really limited things
-    defaultArrays: true
 };
 
 //Code stuff:
@@ -165,44 +160,36 @@ function main() {
     var currentgroup;
     log(1, "group.length: " + group.length);
 
-    if (config.defaultArrays) {
-        for (var i = 0; i < group.length; i++) {
-            log(1, "Looking for: " + group[i]);
-            //Add tempnames, loop through all the arrays
+    for (var i = 0; i < group.length; i++) {
+        log(1, "Looking for: " + group[i]);
 
-            $.each(names, function (index, value) {
+        $.each(names, function (index, value) {
 
-                for (var j = 0; j < value.length; j++) {
-                    if (group[i] === value[j]) {
-                        log(1, "Found match! Group: " + group[i] + " name: " + value[j]);
-                        currentgroup = value[j];
-                        tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
-                        log(1, "Amount of entries: " + tableLength);
+            for (var j = 0; j < value.length; j++) {
+                if (group[i] === value[j]) {
+                    log(1, "Found match! Group: " + group[i] + " name: " + value[j]);
+                    currentgroup = value[j];
+                    tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
+                    log(1, "Amount of entries: " + tableLength);
 
-                        log(1, trainingBarrack);
-                        log(1, currentUnits);
+                    log(1, trainingBarrack);
+                    log(1, currentUnits);
 
-                        calcTroops();
+                    calcTroops();
 
-                        log(1, currentUnits);
+                    log(1, currentUnits);
 
-                        for (k = 0; k < tableLength; k++) {
-                            var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
-                            var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-                            var unitsValue = units[value[j]];
-                            log(1, "value: " + value[j]);
-                            log(1, unitsValue);
-                            var displayText = units[value[j]][k] - textAfterHash - currentUnits[k];
+                    for (k = 0; k < tableLength; k++) {
+                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
+                        var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+                        var displayText = units[value[j]][k] - textAfterHash - currentUnits[k];
 
-                            $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
-                        }
-                        break;
+                        $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
                     }
+                    break;
                 }
-
-            });
-        }
-    } else {
+            }
+        });
     }
 }
 
@@ -307,10 +294,11 @@ function getGarageRecruiting() {
             var hasClassLit = $("#replace_garage > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(garageUnits[i]);
             if (hasClassLit) {
                 var amountTroopsLeftLit = $("#replace_garage > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
-                var parsed = garageUnits[i] + "," + amountTroopsLeft;
+                var parsed = garageUnits[i] + "," + amountTroopsLeftLit;
                 trainingGarage[0] = parsed;
                 logGarage(1, "Lit unit: " + garageUnits[i]);
                 logGarage(1, "And has " + amountTroopsLeftLit + " left");
+                logGarage(1, "Parsed: " + trainingGarage[0]);
                 logGarage(1, "----------");
                 //break;
             }
@@ -329,6 +317,7 @@ function getGarageRecruiting() {
                     trainingGarage[j + 1] = parsed;
                     logGarage(1, "Unit " + j + " has type: " + garageUnits[i]);
                     logGarage(1, "And has " + amountTroopsLeft + " units to do");
+                    logGarage(1, "Parsed: " + trainingGarage[j + 1]);
                     logGarage(1, "----------");
                 } else {
                     logGarage(1, "Nope. Looking for type: " + garageUnits[i]);
@@ -429,7 +418,7 @@ function calcTroops() {
                         break;
                 }
                 currentUnits[k + 8] = currentUnits[k + 8] + parseInt(tempGarage[1], 10);
-                logGarage(1, "garageloop " + currentUnits[k + 7]);
+                logGarage(1, currentUnits[k + 8]);
             }
         }
     }
