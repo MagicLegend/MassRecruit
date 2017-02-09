@@ -2,7 +2,11 @@
 A script for Tribal Wars to improve the mass recruit option.
 
 # Usage
-Just paste the script in a tool like Tampermonkey, and make sure you have a Premium Account. You can add your own custom groupnames and patterns to this script. How? Continue reading!
+Just paste the script in a tool like Tampermonkey, and make sure you have a Premium Account. The script will add an extra column with how many troops still need to be recruited:
+
+![Preview](http://i.imgur.com/ih3fF5T.png)
+
+You can add your own custom groupnames and patterns to this script. How? Continue reading!
 
 #### Custom patterns
 You can add your own groupnames and trooppatterns to the script. When you open the script you'll find to lists looking like this by default:
