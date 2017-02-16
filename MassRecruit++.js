@@ -84,7 +84,7 @@ var units = {
 
 var config = {
     debug: true,
-    level: 0, // 0: nothing, 1: everything, 2: most things, 3: really limited things
+    level: 1, // 0: nothing, 1: everything, 2: most things, 3: really limited things
 };
 
 //Code stuff:
@@ -128,7 +128,8 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         $(".btn[value='Verschil invoeren']").click(function () {
             log(3, "Difference button clicked");
             findVillageAmount();
-            findVillages();
+            testUnits();
+            //findVillages();
         });
     });
 }
@@ -477,6 +478,14 @@ function findVillages() {
             log(3, "Changed tempVillageAmount to: " + tempVillageAmount);
         }
         log(2, "-----------------------------------");
+    }
+}
+
+function testUnits() {
+    for (var u in unit_managers) {
+        if ("units" != u) {
+            log(1, u); //Logs all villageids
+        }
     }
 }
 
