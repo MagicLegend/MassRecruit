@@ -6,6 +6,7 @@
 // @author			MagicLegend
 // @grant			none
 // @include			https://nl*.tribalwars.nl/game.php*
+// @updateURL		https://raw.githubusercontent.com/MagicLegend/MassRecruit/master/MassRecruit%2B%2B-RELEASES/MAIN/MassRecruit%2B%2B.js
 // ==/UserScript==
 
 /** LICENCE:
