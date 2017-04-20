@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 /** LICENCE:
- * MassRecruit++ v0.2 © 2016 MagicLegend
+ * MassRecruit++ v0.3 © 2016 MagicLegend
  * This work is under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) Licence.
  * More info can be found here: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en (Human readable, not the actual licence) & https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode (Actual licence)
  *
@@ -76,10 +76,10 @@ var names = {
 var units = {
     offence: [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0],
     defence: [7500, 8500, 0, 1000, 0, 0, 0, 550, 5, 0],
-    church1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    church2: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    church3: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    custom1: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    church1: [0, 0, 0, 0, 0, 0, 1000, 0, 0, 0],
+    church2: [0, 0, 0, 0, 0, 0, 2000, 0, 0, 0],
+    church3: [0, 0, 0, 0, 0, 0, 3000, 0, 0, 0],
+    custom1: [0, 0, 0, 0, 0, 0, 4000, 0, 0, 0]
 };
 
 var config = {
@@ -134,15 +134,31 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
     });
 }
 
-if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=train/)) {
+//(location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)screen\=train(\?|.*\&)mode\=train/))
+//$('#content_value h2:contains("Rekruteren")').length > 0
+if (game_data.screen == "train" && game_data.mode === "train") {
     log(1, "Href match > mode=train");
 
+    //Quick and dirty way to forcefully rebuild the column every second
+    //window.setInterval( () => reset() , 1000);
+
+
+    //Initial start function
     $(function () {
         log(1, "Screen = train");
+        findExistingUnits();
         createRow();
         main();
+
+        //Function that runs when a unit is completed/page is rebuild via AJAX
+        $(document).on("partial_reload_end", function () {
+            currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            createRow();
+            main();
+        });
     });
 
+    //Recruit button forces a rebuild of the column
     $(".btn-recruit").click(function () {
         log(1, "Clicked button");
         if (!$(".todo").length) {
@@ -153,6 +169,17 @@ if (location.href.match(/(nl|zz|en).*\.tribalwars\.(nl|net)\/game\.php(\?|.*\&)s
         currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         setTimeout(main, 500);
     });
+}
+
+function reset() {
+    if (!$(".todo").length) {
+        log(1, "Resetting...");
+        currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        createRow();
+        main();
+    } else {
+        log(1, "Header exists...");
+    }
 }
 
 function main() {
@@ -438,8 +465,35 @@ function createRow() {
     tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
 
     for (k = 1; k < tableLength + 1; k++) { //+1 to account for the header
-        $("#train_form > .vis > tbody > tr").eq(k).append("<td class = massrecruitplusplus " + allUnits[k] + ">Filler!</td>");
+        $("#train_form > .vis > tbody > tr").eq(k).append("<td class = massrecruitplusplus>Filler!</td>");
     }
+}
+
+function findExistingUnits() {
+//    for (var i = 0; i < Object.keys(unit_managers.units).length; i++) {
+//        log(1, unit_managers.units[i].requirements_met);
+//    }
+
+    log(1, Object.keys(unit_managers.units));
+    var keyArray = Object.keys(unit_managers.units);
+    log(1, keyArray[1]);
+
+    $.each(unit_managers.units, function (i, currUnit) {
+        $.each(currUnit, function (key, val) {
+            if (key == "requirements_met") {
+                log(1, "Key: " + i + " Value: " + val);
+            }
+        });
+    });
+
+
+    //for (var property in unit_managers.units) {
+    //    for (var p in property) {
+    //        if (p.hasOwnProperty("iron")) {
+    //            log(1, p.iron + " has met it's requirements!");
+    //        }
+    //    }
+    //}
 }
 
 //--[[Functions for the mass-recruit function]]--
