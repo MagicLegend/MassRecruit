@@ -10,8 +10,8 @@
 
 /** LICENCE:
  * MassRecruit++ v0.3 © 2016 MagicLegend
- * This work is under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) Licence.
- * More info can be found here: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en (Human readable, not the actual licence) & https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode (Actual licence)
+ * This work is under the Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) License.
+ * More info can be found here: https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en (Human readable, not the actual license) & https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode (Actual licence)
  *
  * v0.1		Initial work, trying some stuff
  * v0.2		Now works for the offence category
@@ -40,7 +40,7 @@
  * - Calculate every time a number/key is pressed for live stats
  *
  ** KNOWN BUGS:
- * - When an unit is finished the added column is removed
+ * - None!
  */
 
 //Variable stuff:
@@ -53,6 +53,8 @@ var trainingGarage = [];
 var names = [];
 var units = [];
 var currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var displayUnits = [null, null, null, null, null, null, null, null, null, null];
+var researchedUnits = [false, false, false, false, false, false, false, false, false, false];
 
 var barrackUnits = ["spear", "sword", "axe", "archer"];
 var stableUnits = ["spy", "light", "marcher", "heavy"];
@@ -209,13 +211,36 @@ function main() {
 
                     log(1, currentUnits);
 
-                    for (k = 0; k < tableLength; k++) {
-                        var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(k).text();
-                        var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-                        var displayText = units[value[j]][k] - textAfterHash - currentUnits[k];
+                    $.each(displayUnits, function (ind, v) {
+                        //Check if the element about to be inserted has been developed
+                        if (researchedUnits[ind]) {
+                            log(1, "Inserting at " + ind);
+                            var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(ind).text();
+                            var textAfterHash = temp.substring(temp.indexOf('/') + 1);
+                            var displayText = units[value[j]][ind] - textAfterHash - currentUnits[ind];
 
-                        $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayText);
+                            log(1,
+                                "Inserting units: " +
+                                units[value[j]][ind] +
+                                "; textAfterHash: " +
+                                textAfterHash +
+                                "; currentUnits: " +
+                                currentUnits[ind] +
+                                "; Resulting in: " +
+                                displayText);
+
+                            displayUnits[ind] = displayText;
+                        }
+                    });
+
+                    //Filling of the created column
+                    for (var k = 0; k < tableLength; k++) {
+
+
+                        $("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(k).text(displayUnits[k]);
                     }
+
+
                     break;
                 }
             }
@@ -482,6 +507,9 @@ function findExistingUnits() {
         $.each(currUnit, function (key, val) {
             if (key == "requirements_met") {
                 log(1, "Key: " + i + " Value: " + val);
+                var unitPos = allUnits.indexOf(i);
+                log(1, "Pos: " + unitPos);
+                researchedUnits[unitPos] = val;
             }
         });
     });
