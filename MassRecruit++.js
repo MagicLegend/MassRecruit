@@ -166,7 +166,7 @@ function init() {
 		findExistingUnits();
 		createRow();
 		main();
-				//Function that runs when a unit is completed/page is rebuild via AJAX
+		//Function that runs when a unit is completed/page is rebuild via AJAX
 		$(document).on("partial_reload_end", function () {
 			currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 			createRow();
@@ -232,7 +232,7 @@ function main() {
 						if (researchedUnits[ind]) {
 							log(1, "Loop location: " + ind);
 							log(1, "Inserting at " + count);
-							var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(ind).text();
+							var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(count).text();
 							var textAfterHash = temp.substring(temp.indexOf('/') + 1);
 							var displayText = units[value[j]][ind] - textAfterHash - currentUnits[ind];
 
@@ -246,7 +246,8 @@ function main() {
 								"; Resulting in: " +
 								displayText);
 
-							displayUnits[ind] = displayText;
+							displayUnits[count] = displayText;
+							count++;
 						}
 					});
 
@@ -258,7 +259,7 @@ function main() {
 					var count = 0;
 					for (var l = 0; l < researchedUnits.length; l++) {
 						if (researchedUnits[l]) {
-							$("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(count).text(displayUnits[l]);
+							$("#train_form > .vis > tbody > tr .massrecruitplusplus").eq(count).text(displayUnits[count]);
 							count++;
 						}
 					}
