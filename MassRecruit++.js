@@ -53,14 +53,26 @@ var trainingStable = [];
 var trainingGarage = [];
 var names = [];
 var units = [];
-var currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-var displayUnits = [null, null, null, null, null, null, null, null, null, null];
-var researchedUnits = [false, false, false, false, false, false, false, false, false, false];
+var currentUnits;
+var displayUnits;
+var researchedUnits;
+var allUnits;
 
-var barrackUnits = ["spear", "sword", "axe", "archer"];
-var stableUnits = ["spy", "light", "marcher", "heavy"];
-var garageUnits = ["ram", "catapult"];
-var allUnits = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "heavy", "ram", "catapult"];
+// var currentUnits = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+// var displayUnits = [null, null, null, null, null, null, null, null, null, null];
+// var researchedUnits = [false, false, false, false, false, false, false, false, false, false];
+// var allUnits = ["spear", "sword", "axe", "archer", "spy", "light", "marcher", "heavy", "ram", "catapult"]; //Generatable?
+
+/**
+ * Units in the game. Should be the data-unit html property value, found on the image or link in the html.
+ * All other arrays will scale acording to these three.
+ */
+
+var units = {
+	barrack: ["spear", "sword", "axe", "archer"],
+	stable: ["spy", "light", "marcher", "heavy"],
+	garage: ["ram", "catapult"]
+};
 
 //Name of the recruiting page; used to check if the right page is loaded.
 //If the script doesn't work; it might be that this word is different (loalisation),
@@ -71,7 +83,6 @@ var pageHeadName = "Rekruteren";
  * Keywords that the script should look for. Note that you can add custom names and units by adding a new line to the objects.
  * When adding new names make sure your formatting is correct, otherwise it will throw errors at you like crazy!
  */
-
 var names = {
 	offence: ["off", "offence"],
 	defence: ["def", "defence", "deff"],
@@ -82,7 +93,7 @@ var names = {
 };
 
 //Target units. Should match the previous keywords.
-var units = {
+var targetUnits = {
 	offence: [0, 0, 8500, 0, 500, 2500, 0, 0, 150, 0],
 	defence: [7500, 8500, 0, 1000, 0, 0, 0, 550, 5, 0],
 	church1: [0, 0, 0, 0, 0, 0, 1000, 0, 0, 0],
@@ -159,10 +170,19 @@ if (game_data.screen == "train" && game_data.mode === "train") {
 	init();
 }
 
+if (game_data.screen == "barracks") {
+
+} else if (game_data.screen == "stable") {
+
+} else if (game_data.screen == "garage") {
+
+}
+
 function init() {
 //Initial start function
 	$(function () {
 		log(1, "Screen = train");
+		generateUnitArrays();
 		findExistingUnits();
 		createRow();
 		main();
@@ -187,6 +207,16 @@ function init() {
 	});
 }
 
+/**
+ * Generates the neccisary empty arrays based on the units object with the arrays.
+ */
+function generateUnitArrays() {
+	count = units.barrack.length + units.stable.length + units.garage.length; //Amount of units in the game
+	allUnits = units.barrack.concat(units.stable).concat(units.garage); //Array with all the units in the game
+	currentUnits = Array(count).fill(0);
+	displayUnits = Array(count).fill(null);
+	researchedUnits = Array(count).fill(false);
+}
 
 function reset() {
 	if (!$(".todo").length) {
@@ -234,11 +264,11 @@ function main() {
 							log(1, "Inserting at " + count);
 							var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(count).text();
 							var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-							var displayText = units[value[j]][ind] - textAfterHash - currentUnits[ind];
+							var displayText = targetUnits[value[j]][ind] - textAfterHash - currentUnits[ind];
 
 							log(1,
 								"Inserting units: " +
-								units[value[j]][ind] +
+								targetUnits[value[j]][ind] +
 								"; textAfterHash: " +
 								textAfterHash +
 								"; currentUnits: " +
@@ -283,13 +313,13 @@ function getBarrackRecruiting() {
 
 
 		//--[[Code for finding the current recruiting lit unit]]--
-		for (var i = 0; i < barrackUnits.length; i++) {
-			var hasClassLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(barrackUnits[i]);
+		for (var i = 0; i < units.barrack.length; i++) {
+			var hasClassLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(units.barrack[i]);
 			if (hasClassLit) {
 				var amountTroopsLeftLit = $("#replace_barracks > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
-				var parsed = barrackUnits[i] + "," + amountTroopsLeftLit;
+				var parsed = units.barrack[i] + "," + amountTroopsLeftLit;
 				trainingBarrack[0] = parsed;
-				logBarrack(1, "Lit unit: " + barrackUnits[i]);
+				logBarrack(1, "Lit unit: " + units.barrack[i]);
 				logBarrack(1, "And has " + amountTroopsLeftLit + " left");
 				logBarrack(1, "----------");
 				//break;
@@ -300,14 +330,14 @@ function getBarrackRecruiting() {
 		//--[[Code for finding the list of recruiting units]]--
 		for (var j = 0; j < trainingLength; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
 			//log(1, "First for loop " + j);
-			for (var i = 0; i < barrackUnits.length; i++) {
+			for (var i = 0; i < units.barrack.length; i++) {
 				//log(1, "Entered for loop " + i);
-				var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > #trainorder_" + j + " > td > .unit_sprite").hasClass(barrackUnits[i]);
+				var hasClassRest = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > #trainorder_" + j + " > td > .unit_sprite").hasClass(units.barrack[i]);
 				if (hasClassRest) {
 					var amountTroopsLeft = $("#replace_barracks > .trainqueue_wrap > .vis > #trainqueue_barracks > #trainorder_" + j + " > td").text().match(/\d+/);
-					var parsed = barrackUnits[i] + "," + amountTroopsLeft;
+					var parsed = units.barrack[i] + "," + amountTroopsLeft;
 					trainingBarrack[j + 1] = parsed;
-					logBarrack(1, "Unit " + j + " has type: " + barrackUnits[i]);
+					logBarrack(1, "Unit " + j + " has type: " + units.barrack[i]);
 					logBarrack(1, "And has " + amountTroopsLeft + " units to do");
 					logBarrack(1, "----------");
 				} else {
@@ -327,13 +357,13 @@ function getStableRecruiting() {
 		logStable(1, "trainingLength: " + trainingLength);
 
 		//--[[Code for finding the current recruiting lit unit]]--
-		for (var i = 0; i < stableUnits.length; i++) {
-			var hasClassLit = $("#replace_stable > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(stableUnits[i]);
+		for (var i = 0; i < units.stable.length; i++) {
+			var hasClassLit = $("#replace_stable > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(units.stable[i]);
 			if (hasClassLit) {
 				var amountTroopsLeftLit = $("#replace_stable > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
-				var parsed = stableUnits[i] + "," + amountTroopsLeftLit;
+				var parsed = units.stable[i] + "," + amountTroopsLeftLit;
 				trainingStable[0] = parsed;
-				logStable(1, "Lit unit: " + stableUnits[i]);
+				logStable(1, "Lit unit: " + units.stable[i]);
 				logStable(1, "And has " + amountTroopsLeftLit + " left");
 				logStable(1, "----------");
 				//break;
@@ -344,14 +374,14 @@ function getStableRecruiting() {
 		//--[[Code for finding the list of recruiting units]]--
 		for (var j = 0; j < trainingLength; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
 			//log(1, "First for loop " + j);
-			for (var i = 0; i < stableUnits.length; i++) {
+			for (var i = 0; i < units.stable.length; i++) {
 				//log(1, "Entered for loop " + i);
-				var hasClassRest = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td > .unit_sprite").hasClass(stableUnits[i]);
+				var hasClassRest = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td > .unit_sprite").hasClass(units.stable[i]);
 				if (hasClassRest) {
 					var amountTroopsLeft = $("#replace_stable > .trainqueue_wrap > .vis > #trainqueue_stable > #trainorder_" + j + " > td").text().match(/\d+/);
-					var parsed = stableUnits[i] + "," + amountTroopsLeft;
+					var parsed = units.stable[i] + "," + amountTroopsLeft;
 					trainingStable[j + 1] = parsed;
-					logStable(1, "Unit " + j + " has type: " + stableUnits[i]);
+					logStable(1, "Unit " + j + " has type: " + units.stable[i]);
 					logStable(1, "And has " + amountTroopsLeft + " units to do");
 					logStable(1, "----------");
 				} else {
@@ -372,13 +402,13 @@ function getGarageRecruiting() {
 
 
 		//--[[Code for finding the current recruiting lit unit]]--
-		for (var i = 0; i < garageUnits.length; i++) {
-			var hasClassLit = $("#replace_garage > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(garageUnits[i]);
+		for (var i = 0; i < units.garage.length; i++) {
+			var hasClassLit = $("#replace_garage > .trainqueue_wrap > .vis > tbody > .lit > .lit-item > .unit_sprite").hasClass(units.garage[i]);
 			if (hasClassLit) {
 				var amountTroopsLeftLit = $("#replace_garage > .trainqueue_wrap > .vis > tbody > .lit > .lit-item").first().text().match(/\d+/);
-				var parsed = garageUnits[i] + "," + amountTroopsLeftLit;
+				var parsed = units.garage[i] + "," + amountTroopsLeftLit;
 				trainingGarage[0] = parsed;
-				logGarage(1, "Lit unit: " + garageUnits[i]);
+				logGarage(1, "Lit unit: " + units.garage[i]);
 				logGarage(1, "And has " + amountTroopsLeftLit + " left");
 				logGarage(1, "Parsed: " + trainingGarage[0]);
 				logGarage(1, "----------");
@@ -390,19 +420,19 @@ function getGarageRecruiting() {
 		//--[[Code for finding the list of recruiting units]]--
 		for (var j = 0; j < trainingLength; j++) { //Strange for loop is to reserve a space for the lit item in the first slot
 			//log(1, "First for loop " + j);
-			for (var i = 0; i < garageUnits.length; i++) {
+			for (var i = 0; i < units.garage.length; i++) {
 				//log(1, "Entered for loop " + i);
-				var hasClassRest = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > #trainorder_" + j + " > td > .unit_sprite").hasClass(garageUnits[i]);
+				var hasClassRest = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > #trainorder_" + j + " > td > .unit_sprite").hasClass(units.garage[i]);
 				if (hasClassRest) {
 					var amountTroopsLeft = $("#replace_garage > .trainqueue_wrap > .vis > #trainqueue_garage > #trainorder_" + j + " > td").text().match(/\d+/);
-					var parsed = garageUnits[i] + "," + amountTroopsLeft;
+					var parsed = units.garage[i] + "," + amountTroopsLeft;
 					trainingGarage[j + 1] = parsed;
-					logGarage(1, "Unit " + j + " has type: " + garageUnits[i]);
+					logGarage(1, "Unit " + j + " has type: " + units.garage[i]);
 					logGarage(1, "And has " + amountTroopsLeft + " units to do");
 					logGarage(1, "Parsed: " + trainingGarage[j + 1]);
 					logGarage(1, "----------");
 				} else {
-					logGarage(1, "Nope. Looking for type: " + garageUnits[i]);
+					logGarage(1, "Nope. Looking for type: " + units.garage[i]);
 				}
 			}
 		}
@@ -428,21 +458,21 @@ function getGroups() {
 function calcTroops() {
 	for (var l = 0; l < trainingBarrack.length; l++) {
 		//Barrackloop
-		for (var k = 0; k < barrackUnits.length; k++) {
+		for (var k = 0; k < units.barrack.length; k++) {
 			var tempBarrack = trainingBarrack[l].split(","); //0 = name; 1 = amount;
-			if (tempBarrack[0] == barrackUnits[k]) {
+			if (tempBarrack[0] == units.barrack[k]) {
 				//Match
 				switch (tempBarrack[0]) {
-					case barrackUnits[0]:
+					case units.barrack[0]:
 						logBarrack(1, "Found: spear");
 						break;
-					case barrackUnits[1]:
+					case units.barrack[1]:
 						logBarrack(1, "Found: sword");
 						break;
-					case barrackUnits[2]:
+					case units.barrack[2]:
 						logBarrack(1, "Found: axe");
 						break;
-					case barrackUnits[3]:
+					case units.barrack[3]:
 						logBarrack(1, "Found: archer");
 						break;
 					default: logBarrack(1, "Default case");
@@ -456,21 +486,21 @@ function calcTroops() {
 
 	for (var l = 0; l < trainingStable.length; l++) {
 		//Stableloop
-		for (var k = 0; k < stableUnits.length; k++) {
+		for (var k = 0; k < units.stable.length; k++) {
 			var tempStable = trainingStable[l].split(","); //0 = name; 1 = amount;
-			if (tempStable[0] == stableUnits[k]) {
+			if (tempStable[0] == units.stable[k]) {
 				//Match
 				switch (tempStable[0]) {
-					case stableUnits[0]:
+					case units.stable[0]:
 						logStable(1, "Found: spy");
 						break;
-					case stableUnits[1]:
+					case units.stable[1]:
 						logStable(1, "Found: light");
 						break;
-					case stableUnits[2]:
+					case units.stable[2]:
 						logStable(1, "Found: marcher");
 						break;
-					case stableUnits[3]:
+					case units.stable[3]:
 						logStable(1, "Found: heavy");
 						break;
 					default:
@@ -485,15 +515,15 @@ function calcTroops() {
 
 	for (var l = 0; l < trainingGarage.length; l++) {
 		//Garageloop
-		for (var k = 0; k < garageUnits.length; k++) {
+		for (var k = 0; k < units.garage.length; k++) {
 			var tempGarage = trainingGarage[l].split(","); //0 = name; 1 = amount;
-			if (tempGarage[0] == garageUnits[k]) {
+			if (tempGarage[0] == units.garage[k]) {
 				//Match
 				switch (tempGarage[0]) {
-					case garageUnits[0]:
+					case units.garage[0]:
 						logGarage(1, "Found: ram");
 						break;
-					case garageUnits[1]:
+					case units.garage[1]:
 						logGarage(1, "Found: catapult");
 						break;
 					default: logGarage(1, "Default case");
