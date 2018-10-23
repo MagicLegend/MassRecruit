@@ -244,8 +244,8 @@ function main() {
 
 			for (var j = 0; j < value.length; j++) {
 				if (group[i] === value[j]) {
-					log(1, "Found match! Group: " + group[i] + " name: " + value[j]);
-					currentgroup = value[j];
+					log(1, "Found match! Group: " + group[i] + " name: " + index);
+					currentgroup = index;
 					tableLength = $("#train_form > .vis > tbody > tr").length - 2; //-2 to account for the header and the 'recruit' button
 					log(1, "Amount of entries: " + tableLength);
 
@@ -264,11 +264,11 @@ function main() {
 							log(1, "Inserting at " + count);
 							var temp = $("#train_form > .vis > tbody > tr td:nth-child(3)").eq(count).text();
 							var textAfterHash = temp.substring(temp.indexOf('/') + 1);
-							var displayText = targetUnits[value[j]][ind] - textAfterHash - currentUnits[ind];
+							var displayText = targetUnits[index][ind] - textAfterHash - currentUnits[ind];
 
 							log(1,
 								"Inserting units: " +
-								targetUnits[value[j]][ind] +
+								targetUnits[index][ind] +
 								"; textAfterHash: " +
 								textAfterHash +
 								"; currentUnits: " +
